@@ -104,20 +104,17 @@ Play3DSceneLayer::~Play3DSceneLayer()
 
 void Play3DSceneLayer::updateBeforePhysics()
 {
-    bool cameraSeeObject = false;
     for(const std::shared_ptr<Beryll::GameObject>& go : m_gameObjects)
     {
 /*
         // disable objects for performance
-        cameraSeeObject = Beryll::Camera::getIsSeeObject(go->getPosition());
-
-        if(go->getIsEnabled() && !cameraSeeObject)
-        {
-            go->disable();
-        }
-        else if(!go->getIsEnabled() && cameraSeeObject)
+        if(Beryll::Camera::getIsSeeObject(go->getPosition()))
         {
             go->enable();
+        }
+        else
+        {
+            go->disable();
         }
 */
         // 1. let objects update themselves
