@@ -1,0 +1,3 @@
+[submodule "app/jni/Beryll_engine"]
+	path = app/jni/Beryll_engine
+	url = https://github.com/vovan4ik123-engine/Beryll_engine.git
