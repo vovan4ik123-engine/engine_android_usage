@@ -18,10 +18,11 @@ private:
     //std::shared_ptr<Beryll::SimpleObject> simpleCubeSphere;
     //std::shared_ptr<Beryll::AnimatedObject> enemyMan;
     //std::shared_ptr<Beryll::CollidingAnimatedObject> worm;
-    //std::shared_ptr<Beryll::CollidingSimpleObject> collPlane;
+    std::shared_ptr<Beryll::CollidingSimpleObject> collPlane;
     //std::shared_ptr<Beryll::CollidingSimpleObject> collWall;
     //std::shared_ptr<Beryll::CollidingSimpleObject> player;
     //std::vector<std::shared_ptr<Beryll::CollidingAnimatedObject>> collWarms;
+    std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> collCubes;
 
     std::shared_ptr<Beryll::CollidingSimpleObject> testCube;
     std::shared_ptr<Beryll::CollidingSimpleObject> ground1;

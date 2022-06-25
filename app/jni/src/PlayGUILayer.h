@@ -30,6 +30,8 @@ public:
     std::shared_ptr<Beryll::Text> text1;
     std::shared_ptr<Beryll::Text> text2;
 
+    std::shared_ptr<Beryll::Slider> slider1;
+
     std::shared_ptr<Beryll::DrawAnyFunction> drawFrameTime;
 
     // pause

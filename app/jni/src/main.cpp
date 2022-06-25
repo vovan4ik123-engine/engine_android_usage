@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
     // GUI elements properties
     Beryll::MainImGUI::getInstance()->setButtonsFont("fonts/arial-italic.ttf", 5);
     Beryll::MainImGUI::getInstance()->setCheckBoxesFont("fonts/creamy.ttf", 3);
+    Beryll::MainImGUI::getInstance()->setSlidersFont("fonts/creamy.ttf", 5);
     Beryll::MainImGUI::getInstance()->setTextsFont("fonts/proggy.ttf", 2);
 
     // camera properties
@@ -20,8 +21,8 @@ int main(int argc, char* argv[])
     Beryll::Camera::setPerspectiveFarClipPlane(500.0f);
     Beryll::Camera::setObjectsViewDistance(120.0f);
 
-    // Simulation precision (1-20 range), also increace CPU usage
-    // Increace it if your ball penetrates wall but you want collision
+    // Simulation precision (1-20 range), also increase CPU usage
+    // Increase it if your ball penetrates wall but you want collision
     Beryll::Physics::setResolution(2);
 
     // Create own class MyLayer and inherit from Beryll::Layer provided by engine

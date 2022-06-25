@@ -54,6 +54,12 @@ PlayGUILayer::PlayGUILayer()
     text2->setBackgroundColor(0.0f, 0.0f, 0.4f, 0.7f);
     text2->setFontColor(0.0f, 1.0f, 0.0f, 1.0f);
 
+    slider1 = std::make_shared<Beryll::Slider>("123456   78910", 0, 20, 50, 3, true);
+    slider1->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
+    slider1->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
+    slider1->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
+    slider1->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
+
     drawFrameTime = std::make_shared<Beryll::DrawAnyFunction>(showFrameTime);
 
     // add gameObjects to MyLayer
@@ -64,8 +70,9 @@ PlayGUILayer::PlayGUILayer()
     m_gameObjects.push_back(buttonResetCube);
     m_gameObjects.push_back(buttonMove);
     m_gameObjects.push_back(buttonPause);
-    //m_gameObjects.push_back(checkBox1);
-    //m_gameObjects.push_back(checkBox2);
+    m_gameObjects.push_back(slider1);
+    m_gameObjects.push_back(checkBox1);
+    m_gameObjects.push_back(checkBox2);
     //m_gameObjects.push_back(text1);
     //m_gameObjects.push_back(text2);
     m_gameObjects.push_back(drawFrameTime);
