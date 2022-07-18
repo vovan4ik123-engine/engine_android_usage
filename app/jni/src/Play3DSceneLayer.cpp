@@ -13,17 +13,17 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 //                                                              "diffuseTexture");
 //    m_gameObjects.push_back(simpleCubeSphere);
 //
-//    enemyMan = std::make_shared<Beryll::AnimatedObject>("models/model.dae",
-//                                                        true,
-//                                                        "shaders/GLES/AnimatedModel.vert",
-//                                                        "shaders/GLES/AnimatedModel.frag",
-//                                                        "diffuseTexture");
-//    m_gameObjects.push_back(enemyMan);
-//
+    enemyMan = std::make_shared<Beryll::AnimatedObject>("models/garbage/model.dae",
+                                                        true,
+                                                        "shaders/GLES/AnimatedModel.vert",
+                                                        "shaders/GLES/AnimatedModel.frag",
+                                                        "diffuseTexture");
+    m_gameObjects.push_back(enemyMan);
+
     collPlane = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/CollisionStaticGround.dae",
                                                                 false,
                                                                 0,
-                                                                false,
+                                                                true,
                                                                 Beryll::CollisionFlags::STATIC,
                                                                 Beryll::CollisionGroups::GROUND,
                                                                 Beryll::CollisionGroups::PLAYER | Beryll::CollisionGroups::CUBE | Beryll::CollisionGroups::CAMERA,
@@ -32,15 +32,15 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                 "diffuseTexture");
     m_gameObjects.push_back(collPlane);
 
-    for(int i = 0; i < 50; ++i)
+    for(int i = 0; i < 100; ++i)
     {
         collCubes.push_back(std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/Cube.dae",
-                                                                            false,
+                                                                            true,
                                                                             1.0f,
                                                                             true,
                                                                             Beryll::CollisionFlags::DYNAMIC,
                                                                             Beryll::CollisionGroups::CUBE,
-                                                                            Beryll::CollisionGroups::GROUND,
+                                                                            Beryll::CollisionGroups::GROUND | Beryll::CollisionGroups::CUBE | Beryll::CollisionGroups::PLAYER,
                                                                             "shaders/GLES/SimpleModel.vert",
                                                                             "shaders/GLES/SimpleModel.frag",
                                                                             "diffuseTexture"));
@@ -70,21 +70,24 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 //    Beryll::Physics::setAngularFactor(player->getID(), glm::vec3(0.0f));
 //    Beryll::Physics::disableGravityForObject(player->getID());
 
-    Beryll::Camera::setCameraPos(glm::vec3(300.0f, 0.0f, 0.0f));
-    Beryll::Camera::setCameraFront(glm::vec3(100.0f, 0.0f, 0.0f));
+    player = std::make_shared<Beryll::CollidingSimplePlayer>("models/scene1/ball1.dae",
+                                                             false,
+                                                             3.0f,
+                                                             true,
+                                                             Beryll::CollisionFlags::DYNAMIC,
+                                                             Beryll::CollisionGroups::PLAYER,
+                                                             Beryll::CollisionGroups::GROUND | Beryll::CollisionGroups::CUBE,
+                                                             "shaders/GLES/SimpleModel.vert",
+                                                             "shaders/GLES/SimpleModel.frag",
+                                                             "diffuseTexture");
 
-//    testCube = std::make_shared<Beryll::CollidingSimpleObject>("models/scene1/ball1.dae",
-//                                                                false,
-//                                                                5.0f,
-//                                                                false,
-//                                                                Beryll::CollisionFlags::DYNAMIC,
-//                                                                Beryll::CollisionGroups::CUBE,
-//                                                                Beryll::CollisionGroups::GROUND,
-//                                                                "shaders/GLES/SimpleModel.vert",
-//                                                                "shaders/GLES/SimpleModel.frag",
-//                                                                "diffuseTexture");
-//
-//    m_gameObjects.push_back(testCube);
+    m_gameObjects.push_back(player);
+
+    player->setPosition(glm::vec3(120.0f,140.0f,0.0f));
+    player->setAngularFactor(glm::vec3(0.0f));
+
+    Beryll::Camera::setCameraPos(player->getOrigin() + glm::vec3(150.0f, 0.0f, 0.0f));
+    Beryll::Camera::setCameraFront(player->getOrigin());
 //
 //    Beryll::PhysicsTransforms t = Beryll::Physics::getTransforms(testCube->getID());
 //    BR_INFO("Cube origin: x:{0}, y:{1}, z:{2}", t.position.x, t.position.y, t.position.z);
@@ -127,7 +130,7 @@ void Play3DSceneLayer::updateBeforePhysics()
     {
 /*
         // disable objects for performance
-        if(Beryll::Camera::getIsSeeObject(go->getPosition()))
+        if(Beryll::Camera::getIsSeeObject(go->getOrigin()))
         {
             go->enable();
         }
@@ -135,13 +138,32 @@ void Play3DSceneLayer::updateBeforePhysics()
         {
             go->disable();
         }
-*/
-        // 1. let objects update themselves
+
+        1. let objects update themselves
         if(go->getIsEnabled())
         {
             go->updateBeforePhysics();
         }
+        */
     }
+
+    std::function<void(const std::vector<std::shared_ptr<Beryll::GameObject>>&, int, int)> updateBeforePhysics =
+            [pl = player](const std::vector<std::shared_ptr<Beryll::GameObject>>& v, int begin, int end) -> void // -> void = return type
+            {
+                BR_INFO("Current thread ID:{0}", std::hash<std::thread::id>()(std::this_thread::get_id()));
+                for(int i = begin; i < end; ++i)
+                {
+                    bool see = Beryll::Camera::getIsSeeObject(v[i]->getOrigin());
+                    pl->getOrigin();
+
+                    if(v[i]->getIsEnabled())
+                    {
+                        v[i]->updateBeforePhysics();
+                    }
+                }
+            };
+
+    Beryll::AsyncRun::Run(m_gameObjects, updateBeforePhysics);
 
     std::vector<Beryll::Finger> fingers = Beryll::EventHandler::getFingers();
 
@@ -162,23 +184,21 @@ void Play3DSceneLayer::updateBeforePhysics()
             float deltaY = f.SDL2ScreenPos.y - m_lastFingerMovePosY;
 
             // euler angles * distance
-            m_cameraOffset.x = 100 + (glm::cos(glm::radians(m_angleXZ)) * glm::cos(glm::radians(m_angleYZ)))  * 150;
+            m_cameraOffset.x = (glm::cos(glm::radians(m_angleXZ)) * glm::cos(glm::radians(m_angleYZ)))  * 150;
             m_cameraOffset.y = glm::sin(glm::radians(m_angleYZ))  * 150;
             m_cameraOffset.z = (glm::sin(glm::radians(m_angleXZ)) * glm::cos(glm::radians(m_angleYZ)))  * 150;
 
-            Beryll::Camera::setCameraPos(m_cameraOffset);
-
             m_angleXZ += deltaX;
             m_angleYZ += deltaY;
-            if(m_angleYZ < -89.0f) m_angleYZ = -89.0f;
-            if(m_angleYZ > 89.0f) m_angleYZ = 89.0f;
+            if(m_angleYZ < -88.0f) m_angleYZ = -88.0f;
+            if(m_angleYZ > 88.0f) m_angleYZ = 88.0f;
             m_lastFingerMovePosX = f.SDL2ScreenPos.x;
             m_lastFingerMovePosY = f.SDL2ScreenPos.y;
             break;
         }
     }
 
-    // 2. update them manualy based on GUI layer buttons state
+    // 2. update them manually based on GUI layer buttons state
 
     if(m_guiLayer->buttonResetCube->getIsPressed())
     {
@@ -187,9 +207,9 @@ void Play3DSceneLayer::updateBeforePhysics()
 
 //    if(m_guiLayer->buttonMove->getIsPressed())
 //    {
-//        glm::vec3 newCubePos = glm::vec3(player->getPosition().x + Beryll::Camera::getCameraDirection().x,
-//                                         player->getPosition().y + Beryll::Camera::getCameraDirection().y,
-//                                         player->getPosition().z + Beryll::Camera::getCameraDirection().z);
+//        glm::vec3 newCubePos = glm::vec3(player->getOrigin().x + Beryll::Camera::getCameraDirection().x,
+//                                         player->getOrigin().y + Beryll::Camera::getCameraDirection().y,
+//                                         player->getOrigin().z + Beryll::Camera::getCameraDirection().z);
 //        player->setTransforms(newCubePos);
 //        //BR_INFO("newCubePos x:{0} y:{1} z:{2}", newCubePos.x, newCubePos.y, newCubePos.z);
 //        //BR_INFO("Camera Direction x:{0} y:{1} z:{2}", Beryll::Camera::getCameraDirection().x, Beryll::Camera::getCameraDirection().y, Beryll::Camera::getCameraDirection().z);
@@ -214,16 +234,19 @@ void Play3DSceneLayer::updateAfterPhysics()
     //   BR_INFO("Player collising with ground");
 
     // 3. use objects updated position
-//    Beryll::RayClosestHit rayClosestHit = Beryll::Physics::castRayClosestHit(player->getPosition(),
-//                                                                          player->getPosition() + m_cameraOffset,
+//    Beryll::RayClosestHit rayClosestHit = Beryll::Physics::castRayClosestHit(player->getOrigin(),
+//                                                                          player->getOrigin() + m_cameraOffset,
 //                                                                          Beryll::CollisionGroups::CAMERA,
 //                                                                          Beryll::CollisionGroups::GROUND | Beryll::CollisionGroups::WALL);
 //    if(rayClosestHit)
 //        Beryll::Camera::setCameraPos(rayClosestHit.hitPoint);
 //    else
-//        Beryll::Camera::setCameraPos(player->getPosition() + m_cameraOffset);
+//        Beryll::Camera::setCameraPos(player->getOrigin() + m_cameraOffset);
 //
-//    Beryll::Camera::setCameraFront(player->getPosition());
+//  Beryll::Camera::setCameraFront(player->getOrigin());
+
+    Beryll::Camera::setCameraPos(player->getOrigin() + m_cameraOffset);
+    Beryll::Camera::setCameraFront(player->getOrigin());
 }
 
 void Play3DSceneLayer::draw()

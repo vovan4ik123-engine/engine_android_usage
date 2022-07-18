@@ -16,17 +16,17 @@ public:
 
 private:
     //std::shared_ptr<Beryll::SimpleObject> simpleCubeSphere;
-    //std::shared_ptr<Beryll::AnimatedObject> enemyMan;
+    std::shared_ptr<Beryll::AnimatedObject> enemyMan;
     //std::shared_ptr<Beryll::CollidingAnimatedObject> worm;
     std::shared_ptr<Beryll::CollidingSimpleObject> collPlane;
+    std::shared_ptr<Beryll::CollidingSimplePlayer> player;
     //std::shared_ptr<Beryll::CollidingSimpleObject> collWall;
-    //std::shared_ptr<Beryll::CollidingSimpleObject> player;
     //std::vector<std::shared_ptr<Beryll::CollidingAnimatedObject>> collWarms;
     std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> collCubes;
 
-    std::shared_ptr<Beryll::CollidingSimpleObject> testCube;
-    std::shared_ptr<Beryll::CollidingSimpleObject> ground1;
-    std::shared_ptr<Beryll::CollidingSimpleObject> ground2;
+    //std::shared_ptr<Beryll::CollidingSimpleObject> testCube;
+    //std::shared_ptr<Beryll::CollidingSimpleObject> ground1;
+    //std::shared_ptr<Beryll::CollidingSimpleObject> ground2;
 
     std::shared_ptr<PlayGUILayer> m_guiLayer;
 
@@ -35,5 +35,5 @@ private:
     float m_angleXZ = 0.0f;
     float m_angleYZ = 0.0f;
 
-    glm::vec3 m_cameraOffset = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 m_cameraOffset = glm::vec3(150.0f, 0.0f, 0.0f);
 };

@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 
     // Simulation precision (1-20 range), also increase CPU usage
     // Increase it if your ball penetrates wall but you want collision
-    Beryll::Physics::setResolution(2);
+    Beryll::Physics::setResolution(3);
 
     // Create own class MyLayer and inherit from Beryll::Layer provided by engine
     std::shared_ptr<PlayGUILayer> playGUILayer = std::make_shared<PlayGUILayer>();
