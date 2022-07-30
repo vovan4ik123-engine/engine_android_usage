@@ -32,9 +32,9 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                 "diffuseTexture");
     m_gameObjects.push_back(collPlane);
 
-    for(int i = 0; i < 100; ++i)
+    for(int i = 0; i < 200; ++i)
     {
-        collCubes.push_back(std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/Cube.dae",
+        collCubes.push_back(std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/CubeCapsule.dae",
                                                                             true,
                                                                             1.0f,
                                                                             true,
@@ -47,7 +47,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
         m_gameObjects.push_back(collCubes.back());
         collCubes.back()->setPosition(glm::vec3(Beryll::RandomGenerator::getFastInt(50, 150),
-                                                  140.0f,
+                                                  60.0f,
                                                   Beryll::RandomGenerator::getFastInt(-50, 50)));
     }
 //
@@ -83,7 +83,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     m_gameObjects.push_back(player);
 
-    player->setPosition(glm::vec3(120.0f,140.0f,0.0f));
+    player->setPosition(glm::vec3(120.0f, 60.0f,0.0f));
     player->setAngularFactor(glm::vec3(0.0f));
 
     Beryll::Camera::setCameraPos(player->getOrigin() + glm::vec3(150.0f, 0.0f, 0.0f));
@@ -150,7 +150,6 @@ void Play3DSceneLayer::updateBeforePhysics()
     std::function<void(const std::vector<std::shared_ptr<Beryll::GameObject>>&, int, int)> updateBeforePhysics =
             [pl = player](const std::vector<std::shared_ptr<Beryll::GameObject>>& v, int begin, int end) -> void // -> void = return type
             {
-                BR_INFO("Current thread ID:{0}", std::hash<std::thread::id>()(std::this_thread::get_id()));
                 for(int i = begin; i < end; ++i)
                 {
                     bool see = Beryll::Camera::getIsSeeObject(v[i]->getOrigin());
