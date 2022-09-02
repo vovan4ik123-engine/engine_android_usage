@@ -32,7 +32,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                 "diffuseTexture");
     m_gameObjects.push_back(collPlane);
 
-    for(int i = 0; i < 200; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         collCubes.push_back(std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/CubeCapsule.dae",
                                                                             true,
@@ -47,7 +47,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
         m_gameObjects.push_back(collCubes.back());
         collCubes.back()->setPosition(glm::vec3(Beryll::RandomGenerator::getFastInt(50, 150),
-                                                  60.0f,
+                                                  100.0f,
                                                   Beryll::RandomGenerator::getFastInt(-50, 50)));
     }
 //
@@ -83,7 +83,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     m_gameObjects.push_back(player);
 
-    player->setPosition(glm::vec3(120.0f, 60.0f,0.0f));
+    player->setPosition(glm::vec3(120.0f, 100.0f,0.0f));
     player->setAngularFactor(glm::vec3(0.0f));
 
     Beryll::Camera::setCameraPos(player->getOrigin() + glm::vec3(150.0f, 0.0f, 0.0f));
