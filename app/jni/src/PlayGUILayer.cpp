@@ -38,9 +38,9 @@ PlayGUILayer::PlayGUILayer()
 
     buttonDown = std::make_shared<Beryll::Button>("2", 60, 90, 29, 9);
 
-    buttonResetCube = std::make_shared<Beryll::Button>("Reset", 0, 80, 29, 9);
+    buttonResetCube = std::make_shared<Beryll::Button>("Jump", 0, 80, 29, 9);
 
-    buttonMove = std::make_shared<Beryll::Button>("M", 30, 80, 29, 9, true);
+    buttonMove = std::make_shared<Beryll::Button>("Move", 30, 80, 29, 9, true);
     buttonPause = std::make_shared<Beryll::Button>("Pause", 60, 80, 29, 9);
 
     checkBox1 = std::make_shared<Beryll::CheckBox>("Test box 1", 10, 10);
@@ -70,9 +70,9 @@ PlayGUILayer::PlayGUILayer()
     m_gameObjects.push_back(buttonResetCube);
     m_gameObjects.push_back(buttonMove);
     m_gameObjects.push_back(buttonPause);
-    m_gameObjects.push_back(slider1);
-    m_gameObjects.push_back(checkBox1);
-    m_gameObjects.push_back(checkBox2);
+    //m_gameObjects.push_back(slider1);
+    //m_gameObjects.push_back(checkBox1);
+    //m_gameObjects.push_back(checkBox2);
     //m_gameObjects.push_back(text1);
     //m_gameObjects.push_back(text2);
     m_gameObjects.push_back(drawFrameTime);

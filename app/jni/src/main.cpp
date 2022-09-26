@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    BR_INFO("main() started");
+    BR_INFO("%s", "main() started");
     Beryll::GameLoop::create(Beryll::Platform::ANDROID_GLES); // must be called first
     Beryll::GameLoop::setMaxFPS(10);
 
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     // camera properties
     Beryll::Camera::setPerspectiveNearClipPlane(2.0f);
     Beryll::Camera::setPerspectiveFarClipPlane(500.0f);
-    Beryll::Camera::setObjectsViewDistance(120.0f);
+    Beryll::Camera::setObjectsViewDistance(200.0f);
 
     // Simulation precision (1-20 range), also increase CPU usage
     // Increase it if your ball penetrates wall but you want collision
