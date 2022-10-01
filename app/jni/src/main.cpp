@@ -8,17 +8,17 @@ int main(int argc, char* argv[])
 {
     BR_INFO("%s", "main() started");
     Beryll::GameLoop::create(Beryll::Platform::ANDROID_GLES); // must be called first
-    Beryll::GameLoop::setMaxFPS(10);
+    Beryll::GameLoop::setMaxFPS(100);
 
     // GUI elements properties
     Beryll::MainImGUI::getInstance()->setButtonsFont("fonts/arial-italic.ttf", 5);
     Beryll::MainImGUI::getInstance()->setCheckBoxesFont("fonts/creamy.ttf", 3);
-    Beryll::MainImGUI::getInstance()->setSlidersFont("fonts/creamy.ttf", 5);
+    Beryll::MainImGUI::getInstance()->setSlidersFont("fonts/creamy.ttf", 3);
     Beryll::MainImGUI::getInstance()->setTextsFont("fonts/proggy.ttf", 2);
 
     // camera properties
-    Beryll::Camera::setPerspectiveNearClipPlane(2.0f);
-    Beryll::Camera::setPerspectiveFarClipPlane(500.0f);
+    Beryll::Camera::setPerspectiveNearClipPlane(3.0f);
+    Beryll::Camera::setPerspectiveFarClipPlane(300.0f);
     Beryll::Camera::setObjectsViewDistance(200.0f);
 
     // Simulation precision (1-20 range), also increase CPU usage

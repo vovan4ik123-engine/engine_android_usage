@@ -9,16 +9,15 @@ namespace
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
 
-        ImGui::Text("Frame time = %.3u, FPS = %.3u", Beryll::GameLoop::getFrameTime(), Beryll::GameLoop::getFPS());
+        ImGui::Text("Frame time:%.3u, FPS:%.3u", Beryll::GameLoop::getFrameTime(), Beryll::GameLoop::getFPS());
         ImGui::End();
 
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 60.0f));
-        ImGui::Begin("Size", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 28.0f));
+        ImGui::Begin("DrawTime", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
 
-        ImGui::Text("GUI DisplaySize = %.1f,  %.1f", Beryll::MainImGUI::getInstance()->getGUIWidth(), Beryll::MainImGUI::getInstance()->getGUIHeight());
-
+        ImGui::Text("Draw  time:%.3u, Calc time:%.3u", Beryll::GameLoop::drawTime, Beryll::GameLoop::calcTime);
         ImGui::End();
     }
 }
@@ -38,7 +37,7 @@ PlayGUILayer::PlayGUILayer()
 
     buttonDown = std::make_shared<Beryll::Button>("2", 60, 90, 29, 9);
 
-    buttonResetCube = std::make_shared<Beryll::Button>("Jump", 0, 80, 29, 9);
+    buttonJump = std::make_shared<Beryll::Button>("Jump", 0, 80, 29, 9);
 
     buttonMove = std::make_shared<Beryll::Button>("Move", 30, 80, 29, 9, true);
     buttonPause = std::make_shared<Beryll::Button>("Pause", 60, 80, 29, 9);
@@ -54,11 +53,11 @@ PlayGUILayer::PlayGUILayer()
     text2->setBackgroundColor(0.0f, 0.0f, 0.4f, 0.7f);
     text2->setFontColor(0.0f, 1.0f, 0.0f, 1.0f);
 
-    slider1 = std::make_shared<Beryll::Slider>("123456   78910", 0, 20, 50, 3, true);
-    slider1->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
-    slider1->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
-    slider1->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
-    slider1->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
+    sliderCamera = std::make_shared<Beryll::Slider>("Camera distance", 0, 8, 50, 3, true);
+    sliderCamera->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
+    sliderCamera->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
+    sliderCamera->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
+    sliderCamera->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     drawFrameTime = std::make_shared<Beryll::DrawAnyFunction>(showFrameTime);
 
@@ -67,10 +66,10 @@ PlayGUILayer::PlayGUILayer()
     m_gameObjects.push_back(buttonUp);
     m_gameObjects.push_back(buttonMiddle);
     m_gameObjects.push_back(buttonDown);
-    m_gameObjects.push_back(buttonResetCube);
+    m_gameObjects.push_back(buttonJump);
     m_gameObjects.push_back(buttonMove);
     m_gameObjects.push_back(buttonPause);
-    //m_gameObjects.push_back(slider1);
+    m_gameObjects.push_back(sliderCamera);
     //m_gameObjects.push_back(checkBox1);
     //m_gameObjects.push_back(checkBox2);
     //m_gameObjects.push_back(text1);

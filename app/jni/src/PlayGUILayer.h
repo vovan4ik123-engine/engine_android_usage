@@ -20,7 +20,7 @@ public:
     std::shared_ptr<Beryll::Button> buttonUp;
     std::shared_ptr<Beryll::Button> buttonMiddle;
     std::shared_ptr<Beryll::Button> buttonDown;
-    std::shared_ptr<Beryll::Button> buttonResetCube;
+    std::shared_ptr<Beryll::Button> buttonJump;
     std::shared_ptr<Beryll::Button> buttonMove;
     std::shared_ptr<Beryll::Button> buttonPause;
 
@@ -30,7 +30,7 @@ public:
     std::shared_ptr<Beryll::Text> text1;
     std::shared_ptr<Beryll::Text> text2;
 
-    std::shared_ptr<Beryll::Slider> slider1;
+    std::shared_ptr<Beryll::Slider> sliderCamera;
 
     std::shared_ptr<Beryll::DrawAnyFunction> drawFrameTime;
 

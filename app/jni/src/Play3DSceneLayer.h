@@ -27,5 +27,5 @@ private:
     float m_angleXZ = 0.0f;
     float m_angleYZ = 0.0f;
 
-    glm::vec3 m_cameraOffset = glm::vec3(150.0f, 0.0f, 0.0f);
+    glm::vec3 m_cameraOffset = glm::vec3(1.0f, 0.0f, 0.0f);
 };
