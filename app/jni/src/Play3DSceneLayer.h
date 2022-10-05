@@ -15,10 +15,8 @@ public:
     virtual void playSound() override; // play sound of gameobjects here and music on layer
 
 private:
-    //std::shared_ptr<Beryll::SimpleObject> simpleCubeSphere;
-    std::shared_ptr<Beryll::AnimatedObject> enemyMan;
-    //std::shared_ptr<Beryll::CollidingAnimatedObject> worm;
     std::shared_ptr<Beryll::CollidingSimplePlayer> player;
+    std::unique_ptr<Beryll::SkyBox> skyBox;
 
     std::shared_ptr<PlayGUILayer> m_guiLayer;
 

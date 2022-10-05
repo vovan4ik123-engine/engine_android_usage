@@ -4,6 +4,8 @@ namespace
 {
     void showFrameTime()
     {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
+
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
         ImGui::Begin("FrameTime", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
@@ -12,13 +14,15 @@ namespace
         ImGui::Text("Frame time:%.3u, FPS:%.3u", Beryll::GameLoop::getFrameTime(), Beryll::GameLoop::getFPS());
         ImGui::End();
 
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 28.0f));
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 32.0f));
         ImGui::Begin("DrawTime", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
 
         ImGui::Text("Draw  time:%.3u, Calc time:%.3u", Beryll::GameLoop::drawTime, Beryll::GameLoop::calcTime);
         ImGui::End();
+
+        ImGui::PopStyleColor(1);
     }
 }
 

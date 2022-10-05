@@ -11,5 +11,4 @@ uniform sampler2D diffuseTexture;
 void main()
 {
     outColor = texture(diffuseTexture, textureCoords);
-    //outColor = vec4(textureCoords.x, 0.6, textureCoords.y, 1.0);
 }

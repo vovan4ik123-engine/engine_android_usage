@@ -8,6 +8,14 @@ else {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Uladzimir_Karol1\\Android_projects\\keys_alias_alias_1q2q3q4q.jks')
+            storePassword '1q2q3q4q'
+            keyAlias 'alias'
+            keyPassword '1q2q3q4q'
+        }
+    }
     compileSdkVersion 33
     ndkVersion "25.1.8937393"
     defaultConfig {
@@ -25,6 +33,7 @@ android {
                 abiFilters 'arm64-v8a' // 'arm64-v8a' 'armeabi-v7a', 'x86', 'x86_64'
             }
         }
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
