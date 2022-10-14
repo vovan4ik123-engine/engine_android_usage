@@ -14,5 +14,5 @@ void main()
 {
     textureCoords = inTextureCoords;
 
-    gl_Position = MVP_matrix * vec4(inPosition, 1.0);
+    gl_Position = MVP_matrix * vec4(inPosition, 1.0f);
 }

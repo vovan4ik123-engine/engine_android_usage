@@ -8,7 +8,6 @@ int main(int argc, char* argv[])
 {
     BR_INFO("%s", "main() started");
     Beryll::GameLoop::create(Beryll::Platform::ANDROID_GLES); // must be called first
-    Beryll::GameLoop::setMaxFPS(200);
 
     // GUI elements properties
     Beryll::MainImGUI::getInstance()->setButtonsFont("fonts/arial-italic.ttf", 5);

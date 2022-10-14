@@ -12,6 +12,6 @@ void main()
 {
     textureCoords = inPosition;
 
-    vec4 pos = VP_matrix * vec4(inPosition, 1.0);
+    vec4 pos = VP_matrix * vec4(inPosition, 1.0f);
     gl_Position = pos.xyww;
 }

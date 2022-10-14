@@ -17,6 +17,8 @@ public:
 
     std::shared_ptr<Beryll::DemoImGUI> guiDemo;
 
+    std::vector<std::shared_ptr<Beryll::GUIObject>> m_guiObjects;
+
     std::shared_ptr<Beryll::Button> buttonUp;
     std::shared_ptr<Beryll::Button> buttonMiddle;
     std::shared_ptr<Beryll::Button> buttonDown;
@@ -31,6 +33,7 @@ public:
     std::shared_ptr<Beryll::Text> text2;
 
     std::shared_ptr<Beryll::Slider> sliderCamera;
+    std::shared_ptr<Beryll::Slider> sliderSunPower;
 
     std::shared_ptr<Beryll::DrawAnyFunction> drawFrameTime;
 

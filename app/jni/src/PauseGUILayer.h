@@ -14,4 +14,6 @@ public:
     virtual void playSound() override; // play sound of gameobjects here and music on layer
 
     std::shared_ptr<Beryll::Button> buttonResumeGame;
+
+    std::vector<std::shared_ptr<Beryll::GUIObject>> m_guiObjects;
 };

@@ -4,6 +4,22 @@ namespace
 {
     void showFrameTime()
     {
+        static uint32_t frameTime = 0;
+        static uint32_t drawTime = 0;
+        static uint32_t calcTime = 0;
+        static uint32_t FPS = 0;
+        static uint32_t lastUpdate = 0;
+
+        if(Beryll::TimeStep::getMillisecFromStart() > lastUpdate + 200)
+        {
+            frameTime = Beryll::GameLoop::getFrameTime();
+            FPS = Beryll::GameLoop::getFPS();
+            drawTime = Beryll::GameLoop::drawTime;
+            calcTime = Beryll::GameLoop::calcTime;
+
+            lastUpdate = Beryll::TimeStep::getMillisecFromStart();
+        }
+
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
@@ -11,7 +27,7 @@ namespace
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
 
-        ImGui::Text("Frame time:%.3u, FPS:%.3u", Beryll::GameLoop::getFrameTime(), Beryll::GameLoop::getFPS());
+        ImGui::Text("Frame time:%.3u, FPS:%.3u", frameTime, FPS);
         ImGui::End();
 
         ImGui::SetNextWindowPos(ImVec2(0.0f, 32.0f));
@@ -19,7 +35,7 @@ namespace
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
 
-        ImGui::Text("Draw  time:%.3u, Calc time:%.3u", Beryll::GameLoop::drawTime, Beryll::GameLoop::calcTime);
+        ImGui::Text("Draw  time:%.3u, Calc time:%.3u", drawTime, calcTime);
         ImGui::End();
 
         ImGui::PopStyleColor(1);
@@ -63,22 +79,29 @@ PlayGUILayer::PlayGUILayer()
     sliderCamera->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
     sliderCamera->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    sliderSunPower = std::make_shared<Beryll::Slider>("Sun power", 0, 13, 50, 3, true);
+    sliderSunPower->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
+    sliderSunPower->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
+    sliderSunPower->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
+    sliderSunPower->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
+
     drawFrameTime = std::make_shared<Beryll::DrawAnyFunction>(showFrameTime);
 
-    // add gameObjects to MyLayer
-    //m_gameObjects.push_back(guiDemo);
-    m_gameObjects.push_back(buttonUp);
-    m_gameObjects.push_back(buttonMiddle);
-    m_gameObjects.push_back(buttonDown);
-    m_gameObjects.push_back(buttonJump);
-    m_gameObjects.push_back(buttonMove);
-    m_gameObjects.push_back(buttonPause);
-    m_gameObjects.push_back(sliderCamera);
-    //m_gameObjects.push_back(checkBox1);
-    //m_gameObjects.push_back(checkBox2);
-    //m_gameObjects.push_back(text1);
-    //m_gameObjects.push_back(text2);
-    m_gameObjects.push_back(drawFrameTime);
+    // add GUIObjects to MyLayer
+    //m_guiObjects.push_back(guiDemo);
+    m_guiObjects.push_back(buttonUp);
+    m_guiObjects.push_back(buttonMiddle);
+    m_guiObjects.push_back(buttonDown);
+    m_guiObjects.push_back(buttonJump);
+    m_guiObjects.push_back(buttonMove);
+    m_guiObjects.push_back(buttonPause);
+    m_guiObjects.push_back(sliderCamera);
+    m_guiObjects.push_back(sliderSunPower);
+    //m_guiObjects.push_back(checkBox1);
+    //m_guiObjects.push_back(checkBox2);
+    //m_guiObjects.push_back(text1);
+    //m_guiObjects.push_back(text2);
+    m_guiObjects.push_back(drawFrameTime);
 
     // create pause state + layers
     pauseGUILayer = std::make_shared<PauseGUILayer>();
@@ -97,7 +120,7 @@ PlayGUILayer::~PlayGUILayer()
 
 void PlayGUILayer::updateBeforePhysics()
 {
-    for(const std::shared_ptr<Beryll::GameObject>& go : m_gameObjects)
+    for(const std::shared_ptr<Beryll::GUIObject>& go : m_guiObjects)
     {
         if(go->getIsEnabled())
         {
@@ -114,12 +137,12 @@ void PlayGUILayer::updateBeforePhysics()
 
 void PlayGUILayer::updateAfterPhysics()
 {
-    // dont need update GUI objects after physics symulation
+    // dont need update GUI objects after physics simulation
 }
 
 void PlayGUILayer::draw()
 {
-    for(const std::shared_ptr<Beryll::GameObject>& go : m_gameObjects)
+    for(const std::shared_ptr<Beryll::GUIObject>& go : m_guiObjects)
     {
         if(go->getIsEnabled())
         {
@@ -130,7 +153,7 @@ void PlayGUILayer::draw()
 
 void PlayGUILayer::playSound()
 {
-    for(const std::shared_ptr<Beryll::GameObject>& go : m_gameObjects)
+    for(const std::shared_ptr<Beryll::GUIObject>& go : m_guiObjects)
     {
         if(go->getIsEnabled())
         {
