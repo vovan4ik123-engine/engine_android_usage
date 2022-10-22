@@ -11,7 +11,7 @@ layout(location = 4) in vec4 weights;
 const int MAX_BONES = 50; // 50 bones should be enough for most models
 
 uniform mat4 bonesMatrices[MAX_BONES];
-uniform mat4 MVP_matrix;
+uniform mat4 MVPMatrix;
 
 void main()
 {
@@ -39,5 +39,5 @@ void main()
 
     //vec4 transformedByBone = boneTransf * vec4(inPosition, 1.0f);
 
-    gl_Position = MVP_matrix * boneTransf * vec4(inPosition, 1.0f);
+    gl_Position = MVPMatrix * boneTransf * vec4(inPosition, 1.0f);
 }

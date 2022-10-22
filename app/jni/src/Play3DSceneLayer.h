@@ -20,19 +20,31 @@ private:
     std::shared_ptr<Beryll::Shader> m_animSunLight;
     std::shared_ptr<Beryll::Shader> m_shadowMapSimple;
     std::shared_ptr<Beryll::Shader> m_shadowMapAnim;
+    std::shared_ptr<Beryll::Shader> m_simpleSunLightShadowMap;
+    std::shared_ptr<Beryll::Shader> m_animSunLightShadowMap;
 
     std::shared_ptr<PlayGUILayer> m_guiLayer;
 
-    std::vector<std::shared_ptr<Beryll::SceneObject>> m_sceneObjects;
+    std::vector<std::shared_ptr<Beryll::SceneObject>> m_allSceneObjects;
+    std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> m_allGroundObjects;
+    std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> m_allSphereObjects;
     std::vector<std::shared_ptr<Beryll::BaseSimpleObject>> m_allSimpleObjects;
     std::vector<std::shared_ptr<Beryll::BaseAnimatedObject>> m_allAnimatedObjects;
     std::shared_ptr<Beryll::CollidingSimplePlayer> m_player;
     std::unique_ptr<Beryll::SkyBox> m_skyBox;
+
+    std::unique_ptr<Beryll::Texture> m_shadowMapTexture = nullptr;
 
     float m_lastFingerMovePosX = 0.0f;
     float m_lastFingerMovePosY = 0.0f;
     float m_angleXZ = 0.0f;
     float m_angleYZ = 0.0f;
 
-    glm::vec3 m_cameraOffset = glm::vec3(0.0f, 1.0f, 1.0f);
+    glm::vec3 m_cameraOffset = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    // draw shadow map debug
+    std::shared_ptr<Beryll::Shader> m_drawShadowMap;
+    void drawShadowMap();
+    uint32_t quadVAO = 0;
+    uint32_t quadVBO = 0;
 };
