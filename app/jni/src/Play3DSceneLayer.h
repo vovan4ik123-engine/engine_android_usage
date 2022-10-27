@@ -18,10 +18,15 @@ private:
     void createShaders();
     std::shared_ptr<Beryll::Shader> m_simpleSunLight;
     std::shared_ptr<Beryll::Shader> m_animSunLight;
+
     std::shared_ptr<Beryll::Shader> m_shadowMapSimple;
     std::shared_ptr<Beryll::Shader> m_shadowMapAnim;
+
     std::shared_ptr<Beryll::Shader> m_simpleSunLightShadowMap;
     std::shared_ptr<Beryll::Shader> m_animSunLightShadowMap;
+
+    std::shared_ptr<Beryll::Shader> m_simpleSunLightShadowMapNormalMap;
+    std::shared_ptr<Beryll::Shader> m_animSunLightShadowMapNormalMap;
 
     std::shared_ptr<PlayGUILayer> m_guiLayer;
 
@@ -33,7 +38,9 @@ private:
     std::shared_ptr<Beryll::CollidingSimplePlayer> m_player;
     std::unique_ptr<Beryll::SkyBox> m_skyBox;
 
-    std::unique_ptr<Beryll::Texture> m_shadowMapTexture = nullptr;
+    std::unique_ptr<Beryll::Texture> m_shadowMapTexture;
+    std::unique_ptr<Beryll::Texture> m_ballNormalMapTexture;
+    std::unique_ptr<Beryll::Texture> m_groundNormalMapTexture;
 
     float m_lastFingerMovePosX = 0.0f;
     float m_lastFingerMovePosY = 0.0f;

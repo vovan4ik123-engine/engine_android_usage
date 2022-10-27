@@ -21,7 +21,7 @@ void main()
     textureCoords = inTextureCoords;
     normal = normalize(normalMatrix * inNormal);
 
-    fragPos = vec3(modelMatrix * vec4(inPosition, 1.0f));
+    fragPos = (modelMatrix * vec4(inPosition, 1.0f)).xyz;
     fragPosLightPerspective = (MVPLightMatrix * vec4(inPosition, 1.0f)) * 0.5 + 0.5;
 
     gl_Position = MVPMatrix * vec4(inPosition, 1.0f);

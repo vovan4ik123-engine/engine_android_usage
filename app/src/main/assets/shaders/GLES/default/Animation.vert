@@ -5,8 +5,8 @@ precision highp float; // highp mediump lowp
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTextureCoords;
-layout(location = 3) in ivec4 boneIDs; // INT pointer here
-layout(location = 4) in vec4 weights;
+layout(location = 3) in ivec4 inBoneIDs; // INT pointer here
+layout(location = 4) in vec4 inWeights;
 
 out vec2 textureCoords;
 
@@ -21,21 +21,21 @@ void main()
 
     // animation must contain minimum 0 bones per vertex. Maximum = 4
     mat4 boneTransf;
-    if(boneIDs[0] != -1 && weights[0] != -1.0f)
+    if(inBoneIDs[0] != -1 && inWeights[0] != -1.0f)
     {
-        boneTransf = bonesMatrices[boneIDs[0]] * weights[0];
+        boneTransf = bonesMatrices[inBoneIDs[0]] * inWeights[0];
 
-        if(boneIDs[1] != -1 && weights[1] != -1.0f)
+        if(inBoneIDs[1] != -1 && inWeights[1] != -1.0f)
         {
-            boneTransf += bonesMatrices[boneIDs[1]] * weights[1];
+            boneTransf += bonesMatrices[inBoneIDs[1]] * inWeights[1];
 
-            if(boneIDs[2] != -1 && weights[2] != -1.0f)
+            if(inBoneIDs[2] != -1 && inWeights[2] != -1.0f)
             {
-                boneTransf += bonesMatrices[boneIDs[2]] * weights[2];
+                boneTransf += bonesMatrices[inBoneIDs[2]] * inWeights[2];
 
-                if(boneIDs[3] != -1 && weights[3] != -1.0f)
+                if(inBoneIDs[3] != -1 && inWeights[3] != -1.0f)
                 {
-                    boneTransf += bonesMatrices[boneIDs[3]] * weights[3];
+                    boneTransf += bonesMatrices[inBoneIDs[3]] * inWeights[3];
                 }
             }
         }

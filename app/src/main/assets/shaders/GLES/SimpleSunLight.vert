@@ -19,7 +19,7 @@ void main()
     textureCoords = inTextureCoords;
     normal = normalize(normalMatrix * inNormal);
 
-    fragPos = vec3(modelMatrix * vec4(inPosition, 1.0f));
+    fragPos = (modelMatrix * vec4(inPosition, 1.0f)).xyz;
 
     gl_Position = MVPMatrix * vec4(inPosition, 1.0f);
 }

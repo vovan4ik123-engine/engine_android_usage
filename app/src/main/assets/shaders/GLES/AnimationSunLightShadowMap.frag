@@ -25,7 +25,7 @@ void main()
 
     // specular
     vec3 fragToCameraDir = normalize(cameraPos - fragPos);
-    vec3 reflectDir = reflect(sunLightDir, normal); // reflect(pointFrom, normal);
+    vec3 reflectDir = reflect(sunLightDir, normal); // reflect(fromLightPosToFragPos, normal);
     float specular = pow(max(dot(fragToCameraDir, reflectDir), 0.0f), 32.0f) * specularLightStrength;
 
     // shadow

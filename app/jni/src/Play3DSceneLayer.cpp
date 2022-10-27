@@ -126,6 +126,8 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     createShaders();
 
     m_shadowMapTexture = Beryll::Renderer::createShadowMapTexture(2048, 2048);
+    m_ballNormalMapTexture  = Beryll::Renderer::createTexture("models/garbage/LeatherNormalMap.jpg", Beryll::TextureType::NORMAL_MAP_TEXTURE);
+    m_groundNormalMapTexture  = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100NormalMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
 
     std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> disableModels =
             [this](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
@@ -211,6 +213,8 @@ void Play3DSceneLayer::updateBeforePhysics()
 
     Beryll::AsyncRun::Run(m_allSceneObjects, updateBeforePhysics);
 
+    //BR_INFO("m_player->getOrigin() 2 XYZ %f, %f. %f", m_player->getOrigin().x, m_player->getOrigin().y, m_player->getOrigin().z);
+    //BR_INFO("m_allSphereObjects[0]->getOrigin() 2 XYZ %f, %f. %f", m_allSphereObjects[0]->getOrigin().x, m_allSphereObjects[0]->getOrigin().y, m_allSphereObjects[0]->getOrigin().z);
 //    int numActive = 0;
 //    for(const std::shared_ptr<Beryll::SceneObject>& obj : m_allSceneObjects)
 //    {
@@ -238,6 +242,8 @@ void Play3DSceneLayer::updateAfterPhysics()
             };
 
     Beryll::AsyncRun::Run(m_allSceneObjects, updateAfterPhysics);
+
+    //BR_INFO("m_player->getOrigin() XYZ %f, %f. %f", m_player->getOrigin().x, m_player->getOrigin().y, m_player->getOrigin().z);
 
     // 2. resolve collisions
     //if(Beryll::Physics::getIsCollision(collWall->getID(), m_player->getID()))
@@ -314,7 +320,7 @@ void Play3DSceneLayer::draw()
     static glm::vec3 sunLightDir = glm::normalize(glm::vec3(0.0f) - sunPos);
     static float sunAngle = 0.0f;
     static uint32_t sunUpdatedTime = 0;
-    if(Beryll::TimeStep::getMillisecFromStart() > sunUpdatedTime + 25)
+    if(Beryll::TimeStep::getMillisecFromStart() > sunUpdatedTime + 20)
     {
         // update sun
         sunAngle += 0.5f;
@@ -354,37 +360,6 @@ void Play3DSceneLayer::draw()
     m_simpleSunLightShadowMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
     m_simpleSunLightShadowMap->set1Float("ambientLight", ambientLight);
     m_simpleSunLightShadowMap->set1Float("specularLightStrength", specularLightStrength);
-    //for(const std::shared_ptr<Beryll::BaseSimpleObject>& obj : m_allSimpleObjects)
-
-    for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allGroundObjects)
-    {
-        if(obj->getIsEnabledOnScene())
-        {
-            m_simpleSunLightShadowMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
-
-            obj->useInternalShader = false;
-            obj->useInternalTextures = true;
-            obj->draw();
-        }
-    }
-
-    for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allSphereObjects)
-    {
-        if(obj->getIsEnabledOnScene())
-        {
-            m_simpleSunLightShadowMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_simpleSunLightShadowMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
-
-            obj->useInternalShader = false;
-            obj->useInternalTextures = true;
-            obj->draw();
-        }
-    }
 
     m_simpleSunLightShadowMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * m_player->getModelMatrix());
     m_simpleSunLightShadowMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * m_player->getModelMatrix());
@@ -394,6 +369,46 @@ void Play3DSceneLayer::draw()
     m_player->useInternalShader = false;
     m_player->useInternalTextures = true;
     m_player->draw();
+
+    m_simpleSunLightShadowMapNormalMap->bind();
+    m_ballNormalMapTexture->bind();
+
+    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
+    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_simpleSunLightShadowMapNormalMap->set1Float("ambientLight", ambientLight);
+    m_simpleSunLightShadowMapNormalMap->set1Float("specularLightStrength", specularLightStrength);
+
+    for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allSphereObjects)
+    {
+        if(obj->getIsEnabledOnScene())
+        {
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+
+            obj->useInternalShader = false;
+            obj->useInternalTextures = true;
+            obj->draw();
+        }
+    }
+
+    m_groundNormalMapTexture->bind();
+
+    for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allGroundObjects)
+    {
+        if(obj->getIsEnabledOnScene())
+        {
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+
+            obj->useInternalShader = false;
+            obj->useInternalTextures = true;
+            obj->draw();
+        }
+    }
 
     m_animSunLightShadowMap->bind();
     m_animSunLightShadowMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
@@ -443,31 +458,51 @@ void Play3DSceneLayer::playSound()
 
 void Play3DSceneLayer::createShaders()
 {
-    m_shadowMapSimple = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Simple.vert", "shaders/GLES/shadowMap/Simple.frag");
-    m_shadowMapAnim = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Animation.vert", "shaders/GLES/shadowMap/Animation.frag");
+    m_shadowMapSimple = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Simple.vert",
+                                                       "shaders/GLES/shadowMap/Simple.frag");
+    m_shadowMapAnim = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Animation.vert",
+                                                     "shaders/GLES/shadowMap/Animation.frag");
 
-    m_drawShadowMap = Beryll::Renderer::createShader("shaders/GLES/shadowMap/DrawShadowMap.vert", "shaders/GLES/shadowMap/DrawShadowMap.frag");
+    m_drawShadowMap = Beryll::Renderer::createShader("shaders/GLES/shadowMap/DrawShadowMap.vert",
+                                                     "shaders/GLES/shadowMap/DrawShadowMap.frag");
     m_drawShadowMap->bind();
     m_drawShadowMap->activateShadowMapTexture();
 
-    m_simpleSunLight = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLight.vert", "shaders/GLES/SimpleSunLight.frag");
+    m_simpleSunLight = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLight.vert",
+                                                      "shaders/GLES/SimpleSunLight.frag");
     m_simpleSunLight->bind();
     m_simpleSunLight->activateDiffuseTexture();
 
-    m_animSunLight = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLight.vert", "shaders/GLES/AnimationSunLight.frag");
+    m_animSunLight = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLight.vert",
+                                                    "shaders/GLES/AnimationSunLight.frag");
     m_animSunLight->bind();
     m_animSunLight->activateDiffuseTexture();
 
-    m_simpleSunLightShadowMap = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLightShadowMap.vert", "shaders/GLES/SimpleSunLightShadowMap.frag");
+    m_simpleSunLightShadowMap = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLightShadowMap.vert",
+                                                               "shaders/GLES/SimpleSunLightShadowMap.frag");
     m_simpleSunLightShadowMap->bind();
     m_simpleSunLightShadowMap->activateDiffuseTexture();
     m_simpleSunLightShadowMap->activateShadowMapTexture();
 
-    m_animSunLightShadowMap = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLightShadowMap.vert", "shaders/GLES/AnimationSunLightShadowMap.frag");
+    m_animSunLightShadowMap = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLightShadowMap.vert",
+                                                             "shaders/GLES/AnimationSunLightShadowMap.frag");
     m_animSunLightShadowMap->bind();
     m_animSunLightShadowMap->activateDiffuseTexture();
     m_animSunLightShadowMap->activateShadowMapTexture();
 
+    m_simpleSunLightShadowMapNormalMap = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLightShadowMapNormalMap.vert",
+                                                                        "shaders/GLES/SimpleSunLightShadowMapNormalMap.frag");
+    m_simpleSunLightShadowMapNormalMap->bind();
+    m_simpleSunLightShadowMapNormalMap->activateDiffuseTexture();
+    m_simpleSunLightShadowMapNormalMap->activateShadowMapTexture();
+    m_simpleSunLightShadowMapNormalMap->activateNormalMapTexture();
+
+    m_animSunLightShadowMapNormalMap = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLightShadowMapNormalMap.vert",
+                                                                      "shaders/GLES/AnimationSunLightShadowMapNormalMap.frag");
+    m_animSunLightShadowMapNormalMap->bind();
+    m_animSunLightShadowMapNormalMap->activateDiffuseTexture();
+    m_animSunLightShadowMapNormalMap->activateShadowMapTexture();
+    m_animSunLightShadowMapNormalMap->activateNormalMapTexture();
 }
 
 void Play3DSceneLayer::drawShadowMap()
