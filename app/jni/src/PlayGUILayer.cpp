@@ -73,17 +73,23 @@ PlayGUILayer::PlayGUILayer()
     text2->setBackgroundColor(0.0f, 0.0f, 0.4f, 0.7f);
     text2->setFontColor(0.0f, 1.0f, 0.0f, 1.0f);
 
-    sliderCamera = std::make_shared<Beryll::Slider>("Camera distance", 0, 8, 50, 3, true);
+    sliderCamera = std::make_shared<Beryll::Slider>("Camera distance", 0, 8, 10, 3, true);
     sliderCamera->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
     sliderCamera->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
     sliderCamera->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
     sliderCamera->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    sliderSunPower = std::make_shared<Beryll::Slider>("Sun power", 0, 13, 50, 3, true);
+    sliderSunPower = std::make_shared<Beryll::Slider>("Sun power", 0, 13, 10, 3, true);
     sliderSunPower->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
     sliderSunPower->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
     sliderSunPower->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
     sliderSunPower->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    sliderHeightMap = std::make_shared<Beryll::Slider>("Height maps", 0, 18, 10, 3, true);
+    sliderHeightMap->setFontColor(0.0f, 0.0f, 0.0f, 1.0f);
+    sliderHeightMap->setTextBackgroundColor(1.0f, 1.0f, 1.0f, 0.3f);
+    sliderHeightMap->setDragAreaColor(1.0f, 0.0f, 0.0f, 1.0f);
+    sliderHeightMap->setSliderGrabColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     drawFrameTime = std::make_shared<Beryll::DrawAnyFunction>(showFrameTime);
 
@@ -97,6 +103,7 @@ PlayGUILayer::PlayGUILayer()
     m_guiObjects.push_back(buttonPause);
     m_guiObjects.push_back(sliderCamera);
     m_guiObjects.push_back(sliderSunPower);
+    m_guiObjects.push_back(sliderHeightMap);
     //m_guiObjects.push_back(checkBox1);
     //m_guiObjects.push_back(checkBox2);
     //m_guiObjects.push_back(text1);

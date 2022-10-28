@@ -127,7 +127,9 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     m_shadowMapTexture = Beryll::Renderer::createShadowMapTexture(2048, 2048);
     m_ballNormalMapTexture  = Beryll::Renderer::createTexture("models/garbage/LeatherNormalMap.jpg", Beryll::TextureType::NORMAL_MAP_TEXTURE);
+    m_ballHeightMapTexture  = Beryll::Renderer::createTexture("models/garbage/LeatherHeightMap.png", Beryll::TextureType::HEIGHT_MAP_TEXTURE);
     m_groundNormalMapTexture  = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100NormalMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
+    m_groundHeightMapTexture  = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100HeightMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
 
     std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> disableModels =
             [this](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
@@ -370,22 +372,24 @@ void Play3DSceneLayer::draw()
     m_player->useInternalTextures = true;
     m_player->draw();
 
-    m_simpleSunLightShadowMapNormalMap->bind();
     m_ballNormalMapTexture->bind();
+    m_ballHeightMapTexture->bind();
 
-    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    m_simpleSunLightShadowMapNormalMap->set1Float("ambientLight", ambientLight);
-    m_simpleSunLightShadowMapNormalMap->set1Float("specularLightStrength", specularLightStrength);
+    m_simpleSunLightShadowMapNormalMapHeightMap->bind();
+    m_simpleSunLightShadowMapNormalMapHeightMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
+    m_simpleSunLightShadowMapNormalMapHeightMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("ambientLight", ambientLight);
+    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("specularLightStrength", specularLightStrength);
+    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("heightScale", m_guiLayer->sliderHeightMap->getValue() / 3.0f);
 
     for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allSphereObjects)
     {
         if(obj->getIsEnabledOnScene())
         {
-            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
 
             obj->useInternalShader = false;
             obj->useInternalTextures = true;
@@ -394,6 +398,13 @@ void Play3DSceneLayer::draw()
     }
 
     m_groundNormalMapTexture->bind();
+    //m_groundHeightMapTexture->bind();
+
+    m_simpleSunLightShadowMapNormalMap->bind();
+    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
+    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_simpleSunLightShadowMapNormalMap->set1Float("ambientLight", ambientLight);
+    m_simpleSunLightShadowMapNormalMap->set1Float("specularLightStrength", specularLightStrength);
 
     for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allGroundObjects)
     {
@@ -410,21 +421,25 @@ void Play3DSceneLayer::draw()
         }
     }
 
-    m_animSunLightShadowMap->bind();
-    m_animSunLightShadowMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_animSunLightShadowMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    m_animSunLightShadowMap->set1Float("ambientLight", ambientLight);
-    m_animSunLightShadowMap->set1Float("specularLightStrength", specularLightStrength);
+    m_groundNormalMapTexture->bind();
+    m_groundHeightMapTexture->bind();
+
+    m_animSunLightShadowMapNormalMapHeightMap->bind();
+    m_animSunLightShadowMapNormalMapHeightMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
+    m_animSunLightShadowMapNormalMapHeightMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_animSunLightShadowMapNormalMapHeightMap->set1Float("ambientLight", ambientLight);
+    m_animSunLightShadowMapNormalMapHeightMap->set1Float("specularLightStrength", specularLightStrength);
+    m_animSunLightShadowMapNormalMapHeightMap->set1Float("heightScale", m_guiLayer->sliderHeightMap->getValue() / 3.0f);
 
     std::string boneMatrixNameInShader;
     for(const std::shared_ptr<Beryll::BaseAnimatedObject>& obj : m_allAnimatedObjects)
     {
         if(obj->getIsEnabledOnScene())
         {
-            m_animSunLightShadowMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_animSunLightShadowMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_animSunLightShadowMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_animSunLightShadowMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_animSunLightShadowMapNormalMapHeightMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
 
             uint32_t boneCount = obj->getBoneCount();
             for(int i = 0; i < boneCount; ++i)
@@ -432,7 +447,7 @@ void Play3DSceneLayer::draw()
                 boneMatrixNameInShader = "bonesMatrices[";
                 boneMatrixNameInShader += std::to_string(i);
                 boneMatrixNameInShader += "]";
-                m_animSunLightShadowMap->setMatrix4x4Float(boneMatrixNameInShader.c_str(), obj->getBoneMatrices()[i].finalWorldTransform);
+                m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float(boneMatrixNameInShader.c_str(), obj->getBoneMatrices()[i].finalWorldTransform);
             }
 
             obj->useInternalShader = false;
@@ -503,6 +518,24 @@ void Play3DSceneLayer::createShaders()
     m_animSunLightShadowMapNormalMap->activateDiffuseTexture();
     m_animSunLightShadowMapNormalMap->activateShadowMapTexture();
     m_animSunLightShadowMapNormalMap->activateNormalMapTexture();
+
+    m_simpleSunLightShadowMapNormalMapHeightMap = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLightShadowMapNormalMapHeightMap.vert",
+                                                                                 "shaders/GLES/SimpleSunLightShadowMapNormalMapHeightMap.frag");
+    m_simpleSunLightShadowMapNormalMapHeightMap->bind();
+    m_simpleSunLightShadowMapNormalMapHeightMap->activateDiffuseTexture();
+    m_simpleSunLightShadowMapNormalMapHeightMap->activateShadowMapTexture();
+    m_simpleSunLightShadowMapNormalMapHeightMap->activateNormalMapTexture();
+    m_simpleSunLightShadowMapNormalMapHeightMap->activateHeightMapTexture();
+
+    m_animSunLightShadowMapNormalMapHeightMap = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLightShadowMapNormalMapHeightMap.vert",
+                                                                                 "shaders/GLES/AnimationSunLightShadowMapNormalMapHeightMap.frag");
+    m_animSunLightShadowMapNormalMapHeightMap->bind();
+    m_animSunLightShadowMapNormalMapHeightMap->activateDiffuseTexture();
+    m_animSunLightShadowMapNormalMapHeightMap->activateShadowMapTexture();
+    m_animSunLightShadowMapNormalMapHeightMap->activateNormalMapTexture();
+    m_animSunLightShadowMapNormalMapHeightMap->activateHeightMapTexture();
+
+
 }
 
 void Play3DSceneLayer::drawShadowMap()

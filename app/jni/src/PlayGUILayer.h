@@ -34,6 +34,7 @@ public:
 
     std::shared_ptr<Beryll::Slider> sliderCamera;
     std::shared_ptr<Beryll::Slider> sliderSunPower;
+    std::shared_ptr<Beryll::Slider> sliderHeightMap;
 
     std::shared_ptr<Beryll::DrawAnyFunction> drawFrameTime;
 

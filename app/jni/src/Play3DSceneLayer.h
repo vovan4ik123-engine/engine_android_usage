@@ -28,6 +28,9 @@ private:
     std::shared_ptr<Beryll::Shader> m_simpleSunLightShadowMapNormalMap;
     std::shared_ptr<Beryll::Shader> m_animSunLightShadowMapNormalMap;
 
+    std::shared_ptr<Beryll::Shader> m_simpleSunLightShadowMapNormalMapHeightMap;
+    std::shared_ptr<Beryll::Shader> m_animSunLightShadowMapNormalMapHeightMap;
+
     std::shared_ptr<PlayGUILayer> m_guiLayer;
 
     std::vector<std::shared_ptr<Beryll::SceneObject>> m_allSceneObjects;
@@ -39,8 +42,12 @@ private:
     std::unique_ptr<Beryll::SkyBox> m_skyBox;
 
     std::unique_ptr<Beryll::Texture> m_shadowMapTexture;
+
     std::unique_ptr<Beryll::Texture> m_ballNormalMapTexture;
+    std::unique_ptr<Beryll::Texture> m_ballHeightMapTexture;
+
     std::unique_ptr<Beryll::Texture> m_groundNormalMapTexture;
+    std::unique_ptr<Beryll::Texture> m_groundHeightMapTexture;
 
     float m_lastFingerMovePosX = 0.0f;
     float m_lastFingerMovePosY = 0.0f;

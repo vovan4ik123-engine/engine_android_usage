@@ -6,9 +6,9 @@ in vec3 textureCoords;
 
 out vec4 outColor;
 
-uniform samplerCube diffuseTexture;
+uniform samplerCube skyBoxTexture;
 
 void main()
 {
-    outColor = texture(diffuseTexture, textureCoords);
+    outColor = texture(skyBoxTexture, textureCoords);
 }
