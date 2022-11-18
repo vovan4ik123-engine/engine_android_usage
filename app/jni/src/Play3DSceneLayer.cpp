@@ -1,6 +1,6 @@
 #include "Play3DSceneLayer.h"
 
-#include <GLES3/gl32.h>
+#include <GLES3/gl31.h>
 #include <GLES3/gl3ext.h>
 
 Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
@@ -10,6 +10,9 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     m_guiLayer = std::move(guiLayer);
 
     m_guiLayer->sliderCamera->setValue(0.3f);
+    m_guiLayer->sliderParticlesLifeTime->setValue(0.5f);
+    m_guiLayer->sliderParticlesSize->setValue(0.5f);
+    m_guiLayer->sliderParticles->setValue(0.5f);
 
     m_allSceneObjects.reserve(3000);
     m_allGroundObjects.reserve(150);
@@ -48,20 +51,22 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 //                                                      "shaders/GLES/default/Animation.frag",
 //                                                      "diffuseTexture"));
 
+    //auto simpleCubeSphere = std::make_shared<Beryll::SimpleObject>("models/garbage/NotTriangulated.fbx");
+
     for(int i = 0; i < 1000; ++i)
     {
         auto animatedObject = std::make_shared<Beryll::AnimatedObject>("models/garbage/model.dae");
 
         m_allSceneObjects.push_back(animatedObject);
         m_allAnimatedObjects.push_back(animatedObject);
-        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getFastInt(0, 900),
+        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
                                               20.0f,
-                                              -Beryll::RandomGenerator::getFastInt(0, 900)));
+                                              -Beryll::RandomGenerator::getInt(900)));
 
     }
     for(int i = 0; i < 1000; ++i)
     {
-        auto testBall = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/SphereSphere.dae",
+        auto testBall = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/SphereSphere.fbx",
                                                                         5.0f,
                                                                         true,
                                                                         Beryll::CollisionFlags::DYNAMIC,
@@ -71,9 +76,9 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
         m_allSceneObjects.push_back(testBall);
         m_allSimpleObjects.push_back(testBall);
         m_allSphereObjects.push_back(testBall);
-        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getFastInt(0, 900),
+        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
                                       20.0f,
-                                      -Beryll::RandomGenerator::getFastInt(0, 900)));
+                                      -Beryll::RandomGenerator::getInt(900)));
     }
 
     std::string modelName;
@@ -117,6 +122,9 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     m_allSimpleObjects.push_back(m_player);
 
     m_player->setOrigin(glm::vec3(0.0f, 7.0f,0.0f));
+    m_player->jumpExtendTime = 1.0f;
+    m_player->startJumpPower = 20.0f;
+    m_player->startFallingPower = 20.0f;
 
     Beryll::Camera::setCameraPos(m_player->getOrigin() + glm::vec3(40.0f, 0.0f, 0.0f));
     Beryll::Camera::setCameraFront(m_player->getOrigin());
@@ -126,13 +134,10 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     createShaders();
 
     m_shadowMapTexture = Beryll::Renderer::createShadowMapTexture(2048, 2048);
-    m_ballNormalMapTexture  = Beryll::Renderer::createTexture("models/garbage/LeatherNormalMap.jpg", Beryll::TextureType::NORMAL_MAP_TEXTURE);
-    m_ballHeightMapTexture  = Beryll::Renderer::createTexture("models/garbage/LeatherHeightMap.png", Beryll::TextureType::HEIGHT_MAP_TEXTURE);
-    m_groundNormalMapTexture  = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100NormalMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
-    m_groundHeightMapTexture  = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100HeightMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
+    m_groundNormalMapTexture = Beryll::Renderer::createTexture("models/TestWorld/Ground001-100NormalMap.png", Beryll::TextureType::NORMAL_MAP_TEXTURE);
 
-    std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> disableModels =
-            [this](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+    std::function<void(std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> disableModels =
+            [this](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
             {
                 for(int i = begin; i < end; ++i)
                 {
@@ -144,7 +149,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                 }
             };
 
-    Beryll::AsyncRun::Run(m_allSceneObjects, disableModels);
+    Beryll::AsyncRun::Run<std::shared_ptr<Beryll::SceneObject>>(m_allSceneObjects, disableModels);
 }
 
 Play3DSceneLayer::~Play3DSceneLayer()
@@ -159,11 +164,63 @@ void Play3DSceneLayer::updateBeforePhysics()
     if(m_guiLayer->buttonMove->getIsPressed()) // repeat action
     {
         m_player->move(Beryll::MoveDirection::FORWARD);
+
+        glm::vec3 pos = m_player->getOrigin();
+        pos.y += 4.0f;
+        if(m_guiLayer->checkBoxParticlesCubes->getIsChecked())
+        {
+            Beryll::ParticleSystem::getInstance()->EmitCubesFromCenter(m_guiLayer->sliderParticles->getValue() * 50.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 25.0f,
+                                                                       m_guiLayer->sliderParticlesSize->getValue() * 3.0f, m_guiLayer->sliderParticlesSize->getValue() * 3.0f,
+                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                       pos, {0.0f, 0.0f, 0.0f}, 2.5f);
+        }
+        else
+        {
+            Beryll::ParticleSystem::getInstance()->EmitQuadsFromCenter(m_guiLayer->sliderParticles->getValue() * 50.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 25.0f,
+                                                                       m_guiLayer->sliderParticlesSize->getValue() * 3.0f, m_guiLayer->sliderParticlesSize->getValue() * 3.0f,
+                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                       pos, {0.0f, 0.0f, 0.0f}, 2.5f);
+        }
     }
 
     if(m_guiLayer->buttonJump->getIsPressed()) // one action
     {
         m_player->jump();
+    }
+
+    if(m_guiLayer->buttonExplosion->getIsPressed())
+    {
+        glm::vec3 pos = m_player->getOrigin();
+        pos.y += 4.0f;
+
+        if(m_guiLayer->checkBoxParticlesCubes->getIsChecked())
+        {
+            Beryll::ParticleSystem::getInstance()->EmitCubesExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 2.0f,
+                                                                      m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
+                                                                      {10.0f, 5.0f, 10.0f},
+                                                                      {1.0f, 0.0f, 0.0f, 1.0f}, {0.9f, 0.34f, 0.13f, 0.4f},
+                                                                      pos, {0.0f, 0.0f, 0.0f}, 20.0f);
+
+            Beryll::ParticleSystem::getInstance()->EmitCubesExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 4.0f,
+                                                                      m_guiLayer->sliderParticlesSize->getValue() * 1.0f, m_guiLayer->sliderParticlesSize->getValue() * 2.0f,
+                                                                      {8.0f, 8.0f, 8.0f},
+                                                                      {0.3f, 0.3f, 0.3f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                      pos, {0.0f, 15.0f, 0.0f}, 8.0f);
+        }
+        else
+        {
+            Beryll::ParticleSystem::getInstance()->EmitQuadsExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 2.0f,
+                                                                      m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
+                                                                      {10.0f, 5.0f, 10.0f},
+                                                                      {1.0f, 0.0f, 0.0f, 1.0f}, {0.9f, 0.34f, 0.13f, 0.4f},
+                                                                      pos, {0.0f, 0.0f, 0.0f}, 20.0f);
+
+            Beryll::ParticleSystem::getInstance()->EmitQuadsExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 4.0f,
+                                                                      m_guiLayer->sliderParticlesSize->getValue() * 1.0f, m_guiLayer->sliderParticlesSize->getValue() * 2.0f,
+                                                                      {8.0f, 8.0f, 8.0f},
+                                                                      {0.3f, 0.3f, 0.3f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                      pos, {0.0f, 15.0f, 0.0f}, 8.0f);
+        }
     }
 
     std::vector<Beryll::Finger> fingers = Beryll::EventHandler::getFingers();
@@ -201,8 +258,8 @@ void Play3DSceneLayer::updateBeforePhysics()
 
     // 2. prepare for simulation
 
-    std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> updateBeforePhysics =
-            [](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+    std::function<void(std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> updateBeforePhysics =
+            [](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
             {
                 for(int i = begin; i < end; ++i)
                 {
@@ -231,8 +288,8 @@ void Play3DSceneLayer::updateBeforePhysics()
 void Play3DSceneLayer::updateAfterPhysics()
 {
     // 1. let objects update themselves based on physics simulation
-    std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> updateAfterPhysics =
-            [](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+    std::function<void(std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> updateAfterPhysics =
+            [](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
             {
                 for(int i = begin; i < end; ++i)
                 {
@@ -271,8 +328,8 @@ void Play3DSceneLayer::updateAfterPhysics()
 
 void Play3DSceneLayer::draw()
 {
-    std::function<void(const std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> prepareForDraw =
-            [this](const std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+    std::function<void(std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> prepareForDraw =
+            [this](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
             {
                 for(int i = begin; i < end; ++i)
                 {
@@ -337,14 +394,12 @@ void Play3DSceneLayer::draw()
     sunLightDir = glm::normalize(m_player->getOrigin() - sunPos);
 
 
-    glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 2.0f, 200.0f);
+    glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 4.0f, 200.0f);
     glm::mat4 lightView = glm::lookAt(sunPos,m_player->getOrigin(), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 VPLightMatrix = lightProjection * lightView;
 
     m_shadowMapTexture->drawIntoShadowMap(m_allSimpleObjects,
                                           m_allAnimatedObjects,
-                                          m_shadowMapSimple,
-                                          m_shadowMapAnim,
                                           VPLightMatrix);
 
     m_shadowMapTexture->bind();
@@ -358,8 +413,8 @@ void Play3DSceneLayer::draw()
     const float specularLightStrength = 0.3f + m_guiLayer->sliderSunPower->getValue() * 1.5f;
 
     m_simpleSunLightShadowMap->bind();
-    m_simpleSunLightShadowMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_simpleSunLightShadowMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_simpleSunLightShadowMap->set3Float("sunLightDir", sunLightDir);
+    m_simpleSunLightShadowMap->set3Float("cameraPos", cameraPos);
     m_simpleSunLightShadowMap->set1Float("ambientLight", ambientLight);
     m_simpleSunLightShadowMap->set1Float("specularLightStrength", specularLightStrength);
 
@@ -372,24 +427,20 @@ void Play3DSceneLayer::draw()
     m_player->useInternalTextures = true;
     m_player->draw();
 
-    m_ballNormalMapTexture->bind();
-    m_ballHeightMapTexture->bind();
-
-    m_simpleSunLightShadowMapNormalMapHeightMap->bind();
-    m_simpleSunLightShadowMapNormalMapHeightMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_simpleSunLightShadowMapNormalMapHeightMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("ambientLight", ambientLight);
-    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("specularLightStrength", specularLightStrength);
-    m_simpleSunLightShadowMapNormalMapHeightMap->set1Float("heightScale", m_guiLayer->sliderHeightMap->getValue() / 3.0f);
+    m_simpleSunLightShadowMapNormalMap->bind();
+    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir);
+    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos);
+    m_simpleSunLightShadowMapNormalMap->set1Float("ambientLight", ambientLight);
+    m_simpleSunLightShadowMapNormalMap->set1Float("specularLightStrength", specularLightStrength);
 
     for(const std::shared_ptr<Beryll::CollidingSimpleObject>& obj : m_allSphereObjects)
     {
         if(obj->getIsEnabledOnScene())
         {
-            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_simpleSunLightShadowMapNormalMapHeightMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_simpleSunLightShadowMapNormalMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
 
             obj->useInternalShader = false;
             obj->useInternalTextures = true;
@@ -398,11 +449,10 @@ void Play3DSceneLayer::draw()
     }
 
     m_groundNormalMapTexture->bind();
-    //m_groundHeightMapTexture->bind();
 
     m_simpleSunLightShadowMapNormalMap->bind();
-    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    m_simpleSunLightShadowMapNormalMap->set3Float("sunLightDir", sunLightDir);
+    m_simpleSunLightShadowMapNormalMap->set3Float("cameraPos", cameraPos);
     m_simpleSunLightShadowMapNormalMap->set1Float("ambientLight", ambientLight);
     m_simpleSunLightShadowMapNormalMap->set1Float("specularLightStrength", specularLightStrength);
 
@@ -422,24 +472,22 @@ void Play3DSceneLayer::draw()
     }
 
     m_groundNormalMapTexture->bind();
-    m_groundHeightMapTexture->bind();
 
-    m_animSunLightShadowMapNormalMapHeightMap->bind();
-    m_animSunLightShadowMapNormalMapHeightMap->set3Float("sunLightDir", sunLightDir.x, sunLightDir.y, sunLightDir.z);
-    m_animSunLightShadowMapNormalMapHeightMap->set3Float("cameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    m_animSunLightShadowMapNormalMapHeightMap->set1Float("ambientLight", ambientLight);
-    m_animSunLightShadowMapNormalMapHeightMap->set1Float("specularLightStrength", specularLightStrength);
-    m_animSunLightShadowMapNormalMapHeightMap->set1Float("heightScale", m_guiLayer->sliderHeightMap->getValue() / 3.0f);
+    m_animSunLightShadowMap->bind();
+    m_animSunLightShadowMap->set3Float("sunLightDir", sunLightDir);
+    m_animSunLightShadowMap->set3Float("cameraPos", cameraPos);
+    m_animSunLightShadowMap->set1Float("ambientLight", ambientLight);
+    m_animSunLightShadowMap->set1Float("specularLightStrength", specularLightStrength);
 
     std::string boneMatrixNameInShader;
     for(const std::shared_ptr<Beryll::BaseAnimatedObject>& obj : m_allAnimatedObjects)
     {
         if(obj->getIsEnabledOnScene())
         {
-            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
-            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
-            m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
-            m_animSunLightShadowMapNormalMapHeightMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
+            m_animSunLightShadowMap->setMatrix4x4Float("MVPMatrix", Beryll::Camera::getViewProjection() * obj->getModelMatrix());
+            m_animSunLightShadowMap->setMatrix4x4Float("MVPLightMatrix", VPLightMatrix * obj->getModelMatrix());
+            m_animSunLightShadowMap->setMatrix4x4Float("modelMatrix", obj->getModelMatrix());
+            m_animSunLightShadowMap->setMatrix3x3Float("normalMatrix", glm::mat3(obj->getModelMatrix()));
 
             uint32_t boneCount = obj->getBoneCount();
             for(int i = 0; i < boneCount; ++i)
@@ -447,7 +495,7 @@ void Play3DSceneLayer::draw()
                 boneMatrixNameInShader = "bonesMatrices[";
                 boneMatrixNameInShader += std::to_string(i);
                 boneMatrixNameInShader += "]";
-                m_animSunLightShadowMapNormalMapHeightMap->setMatrix4x4Float(boneMatrixNameInShader.c_str(), obj->getBoneMatrices()[i].finalWorldTransform);
+                m_animSunLightShadowMap->setMatrix4x4Float(boneMatrixNameInShader.c_str(), obj->getBoneMatrices()[i].finalWorldTransform);
             }
 
             obj->useInternalShader = false;
@@ -456,8 +504,9 @@ void Play3DSceneLayer::draw()
         }
     }
 
-    // draw skybox last
+    // draw skybox then particles last
     m_skyBox->draw();
+    Beryll::ParticleSystem::getInstance()->draw();
 }
 
 void Play3DSceneLayer::playSound()
@@ -473,11 +522,6 @@ void Play3DSceneLayer::playSound()
 
 void Play3DSceneLayer::createShaders()
 {
-    m_shadowMapSimple = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Simple.vert",
-                                                       "shaders/GLES/shadowMap/Simple.frag");
-    m_shadowMapAnim = Beryll::Renderer::createShader("shaders/GLES/shadowMap/Animation.vert",
-                                                     "shaders/GLES/shadowMap/Animation.frag");
-
     m_drawShadowMap = Beryll::Renderer::createShader("shaders/GLES/shadowMap/DrawShadowMap.vert",
                                                      "shaders/GLES/shadowMap/DrawShadowMap.frag");
     m_drawShadowMap->bind();
@@ -518,24 +562,6 @@ void Play3DSceneLayer::createShaders()
     m_animSunLightShadowMapNormalMap->activateDiffuseTexture();
     m_animSunLightShadowMapNormalMap->activateShadowMapTexture();
     m_animSunLightShadowMapNormalMap->activateNormalMapTexture();
-
-    m_simpleSunLightShadowMapNormalMapHeightMap = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLightShadowMapNormalMapHeightMap.vert",
-                                                                                 "shaders/GLES/SimpleSunLightShadowMapNormalMapHeightMap.frag");
-    m_simpleSunLightShadowMapNormalMapHeightMap->bind();
-    m_simpleSunLightShadowMapNormalMapHeightMap->activateDiffuseTexture();
-    m_simpleSunLightShadowMapNormalMapHeightMap->activateShadowMapTexture();
-    m_simpleSunLightShadowMapNormalMapHeightMap->activateNormalMapTexture();
-    m_simpleSunLightShadowMapNormalMapHeightMap->activateHeightMapTexture();
-
-    m_animSunLightShadowMapNormalMapHeightMap = Beryll::Renderer::createShader("shaders/GLES/AnimationSunLightShadowMapNormalMapHeightMap.vert",
-                                                                                 "shaders/GLES/AnimationSunLightShadowMapNormalMapHeightMap.frag");
-    m_animSunLightShadowMapNormalMapHeightMap->bind();
-    m_animSunLightShadowMapNormalMapHeightMap->activateDiffuseTexture();
-    m_animSunLightShadowMapNormalMapHeightMap->activateShadowMapTexture();
-    m_animSunLightShadowMapNormalMapHeightMap->activateNormalMapTexture();
-    m_animSunLightShadowMapNormalMapHeightMap->activateHeightMapTexture();
-
-
 }
 
 void Play3DSceneLayer::drawShadowMap()

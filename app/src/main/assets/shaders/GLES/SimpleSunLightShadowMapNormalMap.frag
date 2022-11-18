@@ -7,11 +7,12 @@ in vec3 fragPosTangentSpace;
 in vec3 sunLightDirTangentSpace;
 in vec3 cameraPosTangentSpace;
 in vec4 fragPosLightPerspective;
+in float calculateShadows;
 
 out vec4 outColor;
 
 uniform sampler2D diffuseTexture;
-uniform lowp sampler2DShadow shadowMapTexture;
+uniform sampler2D shadowMapTexture;
 uniform sampler2D normalMapTexture;
 
 uniform float ambientLight;
@@ -32,7 +33,15 @@ void main()
     float specular = pow(max(dot(fragToCameraDir, reflectDir), 0.0f), 32.0f) * specularLightStrength;
 
     // shadow
-    float shadowMultiplier = textureProj(shadowMapTexture, fragPosLightPerspective);
+    float shadowMultiplier = 1.0f;
+    if(calculateShadows == 1.0f) // calculateShadows == true
+    {
+        // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+        float closestDepth = texture(shadowMapTexture, fragPosLightPerspective.xy).r;
+        // get depth of current fragment from light's perspective
+        float currentDepth = fragPosLightPerspective.z;
+        shadowMultiplier = closestDepth < currentDepth ? 0.0f : 1.0f;
+    }
 
     vec3 textureCollor = texture(diffuseTexture, textureCoords).rgb * 0.8f;
     outColor = vec4((ambientLight + (diffuse + specular) * shadowMultiplier) * textureCollor, 1.0f);

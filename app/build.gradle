@@ -8,32 +8,24 @@ else {
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('C:\\Users\\Uladzimir_Karol1\\Android_projects\\keys_alias_alias_1q2q3q4q.jks')
-            storePassword '1q2q3q4q'
-            keyAlias 'alias'
-            keyPassword '1q2q3q4q'
-        }
-    }
     compileSdkVersion 33
     ndkVersion "25.1.8937393"
     defaultConfig {
         if (buildAsApplication) {
             applicationId "org.libsdl.app"
         }
-        minSdkVersion 26
+        minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
             cmake {
+                //arguments "-DCMAKE_BUILD_TYPE=Release"
                 // arguments "-DANDROID_STL=c++_static"
                 // cppFlags "-fexceptions", "-frtti", "-std=c++1z"
                 abiFilters 'arm64-v8a' // 'arm64-v8a' 'armeabi-v7a', 'x86', 'x86_64'
             }
         }
-        signingConfig signingConfigs.release
     }
     buildTypes {
         release {

@@ -19,22 +19,21 @@ public:
 
     std::vector<std::shared_ptr<Beryll::GUIObject>> m_guiObjects;
 
-    std::shared_ptr<Beryll::Button> buttonUp;
-    std::shared_ptr<Beryll::Button> buttonMiddle;
-    std::shared_ptr<Beryll::Button> buttonDown;
     std::shared_ptr<Beryll::Button> buttonJump;
     std::shared_ptr<Beryll::Button> buttonMove;
     std::shared_ptr<Beryll::Button> buttonPause;
+    std::shared_ptr<Beryll::Button> buttonExplosion;
 
-    std::shared_ptr<Beryll::CheckBox> checkBox1;
-    std::shared_ptr<Beryll::CheckBox> checkBox2;
+    std::shared_ptr<Beryll::CheckBox> checkBoxParticlesCubes;
 
     std::shared_ptr<Beryll::Text> text1;
     std::shared_ptr<Beryll::Text> text2;
 
     std::shared_ptr<Beryll::Slider> sliderCamera;
     std::shared_ptr<Beryll::Slider> sliderSunPower;
-    std::shared_ptr<Beryll::Slider> sliderHeightMap;
+    std::shared_ptr<Beryll::Slider> sliderParticles;
+    std::shared_ptr<Beryll::Slider> sliderParticlesLifeTime;
+    std::shared_ptr<Beryll::Slider> sliderParticlesSize;
 
     std::shared_ptr<Beryll::DrawAnyFunction> drawFrameTime;
 

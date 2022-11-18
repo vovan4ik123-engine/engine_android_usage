@@ -8,7 +8,7 @@ layout(location = 2) in vec2 inTextureCoords;
 layout(location = 3) in ivec4 inBoneIDs; // INT pointer here
 layout(location = 4) in vec4 inWeights;
 
-const int MAX_BONES = 50; // 50 bones should be enough for most models
+const int MAX_BONES = 31; // 31 bones should be enough for most models
 
 uniform mat4 bonesMatrices[MAX_BONES];
 uniform mat4 MVPMatrix;

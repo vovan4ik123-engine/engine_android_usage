@@ -14,8 +14,9 @@ out vec3 fragPosTangentSpace;
 out vec3 sunLightDirTangentSpace;
 out vec3 cameraPosTangentSpace;
 out vec4 fragPosLightPerspective;
+out float calculateShadows;
 
-const int MAX_BONES = 50; // 50 bones should be enough for most models
+const int MAX_BONES = 31; // 31 bones should be enough for most models
 
 uniform mat4 bonesMatrices[MAX_BONES];
 
@@ -54,8 +55,19 @@ void main()
     vec4 posTransformedByBone = boneTransf * vec4(inPosition, 1.0f);
 
     textureCoords = inTextureCoords;
+
     vec3 fragPos = (modelMatrix * posTransformedByBone).xyz;
-    fragPosLightPerspective = (MVPLightMatrix * posTransformedByBone) * 0.5 + 0.5;
+    fragPosLightPerspective = (MVPLightMatrix * posTransformedByBone);
+    calculateShadows = 0.0f; // = false by default
+    if(fragPosLightPerspective.x >= -1.0f && fragPosLightPerspective.x <= 1.0f &&
+       fragPosLightPerspective.y >= -1.0f && fragPosLightPerspective.y <= 1.0f &&
+       fragPosLightPerspective.z >= -1.0f && fragPosLightPerspective.z <= 1.0f)
+    {
+        // Perspective divide to transform vertex vrom clip space to NDC(-1.0f 1.0f) then to (0.0f 1.0f)
+        fragPosLightPerspective.xyz = (fragPosLightPerspective.xyz / fragPosLightPerspective.w) * 0.5 + 0.5;
+
+        calculateShadows = 1.0f; // = true. fragment visible from light point of view. calculate shadows
+    }
 
     // lighting
     vec3 T = normalize(normalMatrix * inTangent);

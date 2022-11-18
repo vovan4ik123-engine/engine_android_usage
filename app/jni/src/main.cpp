@@ -7,7 +7,8 @@
 int main(int argc, char* argv[])
 {
     BR_INFO("%s", "main() started");
-    Beryll::GameLoop::create(Beryll::Platform::ANDROID_GLES); // must be called first
+    Beryll::GameLoop::create(); // must be called first
+    //Beryll::GameLoop::setMaxFPS(7);
 
     // GUI elements properties
     Beryll::MainImGUI::getInstance()->setButtonsFont("fonts/arial-italic.ttf", 5);
@@ -22,7 +23,7 @@ int main(int argc, char* argv[])
 
     // Simulation precision (1-20 range), also increase CPU usage
     // Increase it if your ball penetrates wall but you want collision
-    Beryll::Physics::setResolution(3);
+    Beryll::Physics::setResolution(4);
 
     // Create own class MyLayer and inherit from Beryll::Layer provided by engine
     std::shared_ptr<PlayGUILayer> playGUILayer = std::make_shared<PlayGUILayer>();
