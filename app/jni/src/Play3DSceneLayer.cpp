@@ -17,7 +17,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     m_allSceneObjects.reserve(3000);
     m_allGroundObjects.reserve(150);
     m_allSphereObjects.reserve(150);
-    m_allSimpleObjects.reserve(3000);
+    m_simpleObjectsForShadows.reserve(3000);
     m_allAnimatedObjects.reserve(3000);
 
 //    simpleCubeSphere = std::make_shared<Beryll::SimpleObject>("models/cube_text.dae",
@@ -53,18 +53,18 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     //auto simpleCubeSphere = std::make_shared<Beryll::SimpleObject>("models/garbage/NotTriangulated.fbx");
 
-    for(int i = 0; i < 1000; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         auto animatedObject = std::make_shared<Beryll::AnimatedObject>("models/garbage/model.dae");
 
         m_allSceneObjects.push_back(animatedObject);
         m_allAnimatedObjects.push_back(animatedObject);
-        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
+        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(50),
                                               20.0f,
-                                              -Beryll::RandomGenerator::getInt(900)));
+                                              -Beryll::RandomGenerator::getInt(50)));
 
     }
-    for(int i = 0; i < 1000; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         auto testBall = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/SphereSphere.fbx",
                                                                         5.0f,
@@ -74,15 +74,15 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                         Beryll::CollisionGroups::STATIC_ENVIRONMENT | Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT | Beryll::CollisionGroups::PLAYER);
 
         m_allSceneObjects.push_back(testBall);
-        m_allSimpleObjects.push_back(testBall);
+        m_simpleObjectsForShadows.push_back(testBall);
         m_allSphereObjects.push_back(testBall);
-        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
+        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(50),
                                       20.0f,
-                                      -Beryll::RandomGenerator::getInt(900)));
+                                      -Beryll::RandomGenerator::getInt(50)));
     }
 
     std::string modelName;
-    for(int i = 1; i <= 100; ++i)
+    for(int i = 1; i <= 2; ++i)
     {
         if(i < 10)
         {
@@ -107,11 +107,10 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                          Beryll::CollisionGroups::STATIC_ENVIRONMENT | Beryll::CollisionGroups::GROUND,
                                                                          Beryll::CollisionGroups::PLAYER | Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT | Beryll::CollisionGroups::CAMERA);
         m_allSceneObjects.push_back(testWorld);
-        m_allSimpleObjects.push_back(testWorld);
         m_allGroundObjects.push_back(testWorld);
     }
 
-    m_player = std::make_shared<Beryll::CollidingSimplePlayer>("models/garbage/CapsuleCapsule.dae",
+    m_player = std::make_shared<Beryll::CollidingSimplePlayer>("models/garbage/PlayerCapsule.dae",
                                                              10.0f,
                                                              true,
                                                              Beryll::CollisionFlags::DYNAMIC,
@@ -119,7 +118,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                              Beryll::CollisionGroups::STATIC_ENVIRONMENT | Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT);
 
     m_allSceneObjects.push_back(m_player);
-    m_allSimpleObjects.push_back(m_player);
+    m_simpleObjectsForShadows.push_back(m_player);
 
     m_player->setOrigin(glm::vec3(0.0f, 7.0f,0.0f));
     m_player->jumpExtendTime = 1.0f;
@@ -167,20 +166,6 @@ void Play3DSceneLayer::updateBeforePhysics()
 
         glm::vec3 pos = m_player->getOrigin();
         pos.y += 4.0f;
-        if(m_guiLayer->checkBoxParticlesCubes->getIsChecked())
-        {
-            Beryll::ParticleSystem::getInstance()->EmitCubesFromCenter(m_guiLayer->sliderParticles->getValue() * 50.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 25.0f,
-                                                                       m_guiLayer->sliderParticlesSize->getValue() * 3.0f, m_guiLayer->sliderParticlesSize->getValue() * 3.0f,
-                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
-                                                                       pos, {0.0f, 0.0f, 0.0f}, 2.5f);
-        }
-        else
-        {
-            Beryll::ParticleSystem::getInstance()->EmitQuadsFromCenter(m_guiLayer->sliderParticles->getValue() * 50.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 25.0f,
-                                                                       m_guiLayer->sliderParticlesSize->getValue() * 3.0f, m_guiLayer->sliderParticlesSize->getValue() * 3.0f,
-                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
-                                                                       pos, {0.0f, 0.0f, 0.0f}, 2.5f);
-        }
     }
 
     if(m_guiLayer->buttonJump->getIsPressed()) // one action
@@ -188,38 +173,24 @@ void Play3DSceneLayer::updateBeforePhysics()
         m_player->jump();
     }
 
-    if(m_guiLayer->buttonExplosion->getIsPressed())
+    if(m_guiLayer->buttonParticles->getIsPressed())
     {
         glm::vec3 pos = m_player->getOrigin();
         pos.y += 4.0f;
 
         if(m_guiLayer->checkBoxParticlesCubes->getIsChecked())
         {
-            Beryll::ParticleSystem::getInstance()->EmitCubesExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 2.0f,
-                                                                      m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
-                                                                      {10.0f, 5.0f, 10.0f},
-                                                                      {1.0f, 0.0f, 0.0f, 1.0f}, {0.9f, 0.34f, 0.13f, 0.4f},
-                                                                      pos, {0.0f, 0.0f, 0.0f}, 20.0f);
-
-            Beryll::ParticleSystem::getInstance()->EmitCubesExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 4.0f,
-                                                                      m_guiLayer->sliderParticlesSize->getValue() * 1.0f, m_guiLayer->sliderParticlesSize->getValue() * 2.0f,
-                                                                      {8.0f, 8.0f, 8.0f},
-                                                                      {0.3f, 0.3f, 0.3f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
-                                                                      pos, {0.0f, 15.0f, 0.0f}, 8.0f);
+            Beryll::ParticleSystem::getInstance()->EmitCubesFromCenter(m_guiLayer->sliderParticles->getValue() * 100.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
+                                                                       m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
+                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                       pos, {0.0f, 1.0f, 0.0f}, 2.0f);
         }
         else
         {
-            Beryll::ParticleSystem::getInstance()->EmitQuadsExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 2.0f,
-                                                                      m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
-                                                                      {10.0f, 5.0f, 10.0f},
-                                                                      {1.0f, 0.0f, 0.0f, 1.0f}, {0.9f, 0.34f, 0.13f, 0.4f},
-                                                                      pos, {0.0f, 0.0f, 0.0f}, 20.0f);
-
-            Beryll::ParticleSystem::getInstance()->EmitQuadsExplosion(3000.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 4.0f,
-                                                                      m_guiLayer->sliderParticlesSize->getValue() * 1.0f, m_guiLayer->sliderParticlesSize->getValue() * 2.0f,
-                                                                      {8.0f, 8.0f, 8.0f},
-                                                                      {0.3f, 0.3f, 0.3f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
-                                                                      pos, {0.0f, 15.0f, 0.0f}, 8.0f);
+            Beryll::ParticleSystem::getInstance()->EmitQuadsFromCenter(m_guiLayer->sliderParticles->getValue() * 100.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
+                                                                       m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
+                                                                       {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
+                                                                       pos, {0.0f, 1.0f, 0.0f}, 2.0f);
         }
     }
 
@@ -329,49 +300,52 @@ void Play3DSceneLayer::updateAfterPhysics()
 void Play3DSceneLayer::draw()
 {
     std::function<void(std::vector<std::shared_ptr<Beryll::SceneObject>>&, int, int)> prepareForDraw =
-            [this](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+        [this](std::vector<std::shared_ptr<Beryll::SceneObject>>& v, int begin, int end) -> void // -> void = return type
+        {
+            for(int i = begin; i < end; ++i)
             {
-                for(int i = begin; i < end; ++i)
+                if(Beryll::Physics::getIsCollisionGroupContainsOther(v[i]->getCollisionGroup(),Beryll::CollisionGroups::GROUND))
                 {
-                    if(Beryll::Physics::getIsCollisionGroupContainsOther(v[i]->getCollisionGroup(),Beryll::CollisionGroups::GROUND))
+                    // if piece of ground is 100x100 and origin is in center
+                    // 110.0f from m_player origin for max 5 ground pieces enabled
+                    // 155.0f from m_player origin for max 9 ground pieces enabled
+                    if(glm::distance(m_player->getOrigin(), v[i]->getOrigin()) < 155.0f)
                     {
-                        // if piece of ground is 100x100 and origin is in center
-                        // 110.0f from m_player origin for max 5 ground pieces enabled
-                        // 155.0f from m_player origin for max 9 ground pieces enabled
-                        if(glm::distance(m_player->getOrigin(), v[i]->getOrigin()) < 155.0f)
+                        v[i]->enableOnScene();
+                        v[i]->enableCollisionMesh();
+                    }
+                    else
+                    {
+                        v[i]->disableOnScene();
+                        v[i]->disableCollisionMesh();
+                    }
+                }
+                else
+                {
+                    if(Beryll::Camera::getIsSeeObject(v[i]->getOrigin()))
+                    {
+                        v[i]->enableOnScene();
+
+                        if(Beryll::Physics::getIsCollisionGroupContainsOther(v[i]->getCollisionGroup(),Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT))
                         {
-                            v[i]->enableOnScene();
-                            v[i]->enableCollisionMesh();
-                        }
-                        else
-                        {
-                            v[i]->disableOnScene();
-                            v[i]->disableCollisionMesh();
+                            if(glm::distance(m_player->getOrigin(), v[i]->getOrigin()) < 80.0f)
+                            {
+                                v[i]->enableCollisionMesh();
+                            }
+                            else
+                            {
+                                v[i]->disableCollisionMesh();
+                            }
                         }
                     }
                     else
                     {
-                        if(Beryll::Camera::getIsSeeObject(v[i]->getOrigin()))
-                        {
-                            v[i]->enableOnScene();
-                            v[i]->enableCollisionMesh();
-
-                            if(Beryll::Physics::getIsCollisionGroupContainsOther(v[i]->getCollisionGroup(),Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT))
-                            {
-                                if(glm::distance(m_player->getOrigin(), v[i]->getOrigin()) > 80.0f)
-                                {
-                                    v[i]->disableCollisionMesh();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            v[i]->disableOnScene();
-                            v[i]->disableCollisionMesh();
-                        }
+                        v[i]->disableOnScene();
+                        v[i]->disableCollisionMesh();
                     }
                 }
-            };
+            }
+        };
 
     Beryll::AsyncRun::Run(m_allSceneObjects, prepareForDraw);
 
@@ -398,7 +372,7 @@ void Play3DSceneLayer::draw()
     glm::mat4 lightView = glm::lookAt(sunPos,m_player->getOrigin(), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 VPLightMatrix = lightProjection * lightView;
 
-    m_shadowMapTexture->drawIntoShadowMap(m_allSimpleObjects,
+    m_shadowMapTexture->drawIntoShadowMap(m_simpleObjectsForShadows,
                                           m_allAnimatedObjects,
                                           VPLightMatrix);
 
@@ -470,8 +444,6 @@ void Play3DSceneLayer::draw()
             obj->draw();
         }
     }
-
-    m_groundNormalMapTexture->bind();
 
     m_animSunLightShadowMap->bind();
     m_animSunLightShadowMap->set3Float("sunLightDir", sunLightDir);

@@ -30,7 +30,7 @@ private:
     std::vector<std::shared_ptr<Beryll::SceneObject>> m_allSceneObjects;
     std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> m_allGroundObjects;
     std::vector<std::shared_ptr<Beryll::CollidingSimpleObject>> m_allSphereObjects;
-    std::vector<std::shared_ptr<Beryll::BaseSimpleObject>> m_allSimpleObjects;
+    std::vector<std::shared_ptr<Beryll::BaseSimpleObject>> m_simpleObjectsForShadows;
     std::vector<std::shared_ptr<Beryll::BaseAnimatedObject>> m_allAnimatedObjects;
     std::shared_ptr<Beryll::CollidingSimplePlayer> m_player;
     std::unique_ptr<Beryll::SkyBox> m_skyBox;

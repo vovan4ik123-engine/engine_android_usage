@@ -62,9 +62,9 @@ PlayGUILayer::PlayGUILayer()
     buttonPause->setColor(0.4f, 0.4f, 0.4f, 0.3f);
     buttonPause->setClickedColor(0.4f, 0.4f, 0.4f, 0.0f);
 
-    buttonExplosion = std::make_shared<Beryll::Button>("Explosion", 80, 60, 20, 20);
-    buttonExplosion->setColor(0.9f, 0.3f, 0.0f, 0.3f);
-    buttonExplosion->setClickedColor(0.9f, 0.0f, 0.0f, 0.3f);
+    buttonParticles = std::make_shared<Beryll::Button>("Particles", 80, 60, 20, 20, true);
+    buttonParticles->setColor(0.9f, 0.3f, 0.0f, 0.3f);
+    buttonParticles->setClickedColor(0.9f, 0.0f, 0.0f, 0.3f);
 
     //text1 = std::make_shared<Beryll::Text>("Text test1", 30, 50);
 
@@ -102,7 +102,7 @@ PlayGUILayer::PlayGUILayer()
     //m_guiObjects.push_back(guiDemo);
     m_guiObjects.push_back(buttonJump);
     m_guiObjects.push_back(buttonMove);
-    m_guiObjects.push_back(buttonExplosion);
+    m_guiObjects.push_back(buttonParticles);
     m_guiObjects.push_back(buttonPause);
     m_guiObjects.push_back(sliderCamera);
     m_guiObjects.push_back(sliderSunPower);

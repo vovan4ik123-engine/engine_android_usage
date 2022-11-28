@@ -2,11 +2,13 @@
 
 precision highp float; // highp mediump lowp
 
-layout(location = 0) in vec3 inPosition;
+layout(location = 0) in vec4 inPosition;
+layout(location = 1) in vec4 inColor;
 
-uniform mat4 MVPMatrix;
+out vec4 col;
 
 void main()
 {
-    gl_Position = MVPMatrix * vec4(inPosition, 1.0f);
+    col = inColor;
+    gl_Position = inPosition;
 }

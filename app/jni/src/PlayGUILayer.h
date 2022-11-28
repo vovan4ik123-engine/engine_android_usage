@@ -22,7 +22,7 @@ public:
     std::shared_ptr<Beryll::Button> buttonJump;
     std::shared_ptr<Beryll::Button> buttonMove;
     std::shared_ptr<Beryll::Button> buttonPause;
-    std::shared_ptr<Beryll::Button> buttonExplosion;
+    std::shared_ptr<Beryll::Button> buttonParticles;
 
     std::shared_ptr<Beryll::CheckBox> checkBoxParticlesCubes;
 

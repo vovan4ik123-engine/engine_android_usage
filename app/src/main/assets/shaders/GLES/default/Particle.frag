@@ -4,9 +4,9 @@ precision highp float; // highp mediump lowp
 
 out vec4 outColor;
 
-uniform vec4 color;
+in vec4 col;
 
 void main()
 {
-    outColor = color;
+    outColor = col;
 }
