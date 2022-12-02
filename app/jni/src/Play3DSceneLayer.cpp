@@ -180,14 +180,14 @@ void Play3DSceneLayer::updateBeforePhysics()
 
         if(m_guiLayer->checkBoxParticlesCubes->getIsChecked())
         {
-            Beryll::ParticleSystem::getInstance()->EmitCubesFromCenter(m_guiLayer->sliderParticles->getValue() * 100.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
+            Beryll::ParticleSystem::EmitCubesFromCenter(m_guiLayer->sliderParticles->getValue() * 150.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
                                                                        m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
                                                                        {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
                                                                        pos, {0.0f, 1.0f, 0.0f}, 2.0f);
         }
         else
         {
-            Beryll::ParticleSystem::getInstance()->EmitQuadsFromCenter(m_guiLayer->sliderParticles->getValue() * 100.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
+            Beryll::ParticleSystem::EmitQuadsFromCenter(m_guiLayer->sliderParticles->getValue() * 150.0f, m_guiLayer->sliderParticlesLifeTime->getValue() * 35.0f,
                                                                        m_guiLayer->sliderParticlesSize->getValue() * 2.0f, m_guiLayer->sliderParticlesSize->getValue() * 1.0f,
                                                                        {0.9f, 0.34f, 0.13f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.4f},
                                                                        pos, {0.0f, 1.0f, 0.0f}, 2.0f);
@@ -478,7 +478,7 @@ void Play3DSceneLayer::draw()
 
     // draw skybox then particles last
     m_skyBox->draw();
-    Beryll::ParticleSystem::getInstance()->draw();
+    Beryll::ParticleSystem::draw();
 }
 
 void Play3DSceneLayer::playSound()

@@ -17,7 +17,7 @@ namespace
             FPS = Beryll::GameLoop::getFPS();
             drawTime = Beryll::GameLoop::drawTime;
             calcTime = Beryll::GameLoop::calcTime;
-            particlesCount = Beryll::ParticleSystem::getInstance()->getActiveCount();
+            particlesCount = Beryll::ParticleSystem::getActiveCount();
 
             lastUpdate = Beryll::TimeStep::getMillisecFromStart();
         }
@@ -50,19 +50,19 @@ PlayGUILayer::PlayGUILayer()
 
     guiDemo = std::make_shared<Beryll::DemoImGUI>();
 
-    buttonJump = std::make_shared<Beryll::Button>("Jump", 80, 80, 20, 20);
+    buttonJump = std::make_shared<Beryll::Button>("Jump", 85, 80, 15, 20);
     buttonJump->setColor(0.4f, 0.4f, 0.4f, 0.3f);
     buttonJump->setClickedColor(0.4f, 0.4f, 0.4f, 0.0f);
 
-    buttonMove = std::make_shared<Beryll::Button>("Move", -1, 80, 20, 20, true);
+    buttonMove = std::make_shared<Beryll::Button>("Move", -1, 80, 15, 20, true);
     buttonMove->setColor(0.4f, 0.4f, 0.4f, 0.3f);
     buttonMove->setClickedColor(0.4f, 0.4f, 0.4f, 0.0f);
 
-    buttonPause = std::make_shared<Beryll::Button>("Pause", 80, -1, 20, 20);
+    buttonPause = std::make_shared<Beryll::Button>("Pause", 85, -1, 15, 20);
     buttonPause->setColor(0.4f, 0.4f, 0.4f, 0.3f);
     buttonPause->setClickedColor(0.4f, 0.4f, 0.4f, 0.0f);
 
-    buttonParticles = std::make_shared<Beryll::Button>("Particles", 80, 60, 20, 20, true);
+    buttonParticles = std::make_shared<Beryll::Button>("Particles", 85, 60, 15, 20, true);
     buttonParticles->setColor(0.9f, 0.3f, 0.0f, 0.3f);
     buttonParticles->setClickedColor(0.9f, 0.0f, 0.0f, 0.3f);
 
