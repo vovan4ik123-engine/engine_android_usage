@@ -1,7 +1,7 @@
 #include "Play3DSceneLayer.h"
 
-#include <GLES3/gl31.h>
-#include <GLES3/gl3ext.h>
+//#include <GLES3/gl31.h>
+//#include <GLES3/gl3ext.h>
 
 Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 {
@@ -53,18 +53,22 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     //auto simpleCubeSphere = std::make_shared<Beryll::SimpleObject>("models/garbage/NotTriangulated.fbx");
 
-    for(int i = 0; i < 10; ++i)
+    Beryll::LoadingScreen::showProgress(0);
+
+    for(int i = 0; i < 1000; ++i)
     {
         auto animatedObject = std::make_shared<Beryll::AnimatedObject>("models/garbage/model.dae");
 
         m_allSceneObjects.push_back(animatedObject);
         m_allAnimatedObjects.push_back(animatedObject);
-        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(50),
+        animatedObject->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
                                               20.0f,
-                                              -Beryll::RandomGenerator::getInt(50)));
+                                              -Beryll::RandomGenerator::getInt(900)));
 
+        Beryll::LoadingScreen::showProgress(Beryll::LoadingScreen::getProgress() + 0.02f);
     }
-    for(int i = 0; i < 10; ++i)
+
+    for(int i = 0; i < 1000; ++i)
     {
         auto testBall = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/SphereSphere.fbx",
                                                                         5.0f,
@@ -76,13 +80,15 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
         m_allSceneObjects.push_back(testBall);
         m_simpleObjectsForShadows.push_back(testBall);
         m_allSphereObjects.push_back(testBall);
-        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(50),
+        testBall->setOrigin(glm::vec3(Beryll::RandomGenerator::getInt(900),
                                       20.0f,
-                                      -Beryll::RandomGenerator::getInt(50)));
+                                      -Beryll::RandomGenerator::getInt(900)));
+
+        Beryll::LoadingScreen::showProgress(Beryll::LoadingScreen::getProgress() + 0.02f);
     }
 
     std::string modelName;
-    for(int i = 1; i <= 2; ++i)
+    for(int i = 1; i <= 100; ++i)
     {
         if(i < 10)
         {
@@ -108,6 +114,8 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                                                                          Beryll::CollisionGroups::PLAYER | Beryll::CollisionGroups::DYNAMIC_ENVIRONMENT | Beryll::CollisionGroups::CAMERA);
         m_allSceneObjects.push_back(testWorld);
         m_allGroundObjects.push_back(testWorld);
+
+        Beryll::LoadingScreen::showProgress(Beryll::LoadingScreen::getProgress() + 0.2f);
     }
 
     m_player = std::make_shared<Beryll::CollidingSimplePlayer>("models/garbage/PlayerCapsule.dae",
@@ -124,6 +132,8 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     m_player->jumpExtendTime = 1.0f;
     m_player->startJumpPower = 20.0f;
     m_player->startFallingPower = 20.0f;
+
+    Beryll::LoadingScreen::showProgress(70);
 
     Beryll::Camera::setCameraPos(m_player->getOrigin() + glm::vec3(40.0f, 0.0f, 0.0f));
     Beryll::Camera::setCameraFront(m_player->getOrigin());
@@ -148,7 +158,11 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
                 }
             };
 
+    Beryll::LoadingScreen::showProgress(90);
+
     Beryll::AsyncRun::Run<std::shared_ptr<Beryll::SceneObject>>(m_allSceneObjects, disableModels);
+
+    Beryll::LoadingScreen::showProgress(100);
 }
 
 Play3DSceneLayer::~Play3DSceneLayer()
@@ -494,10 +508,10 @@ void Play3DSceneLayer::playSound()
 
 void Play3DSceneLayer::createShaders()
 {
-    m_drawShadowMap = Beryll::Renderer::createShader("shaders/GLES/shadowMap/DrawShadowMap.vert",
-                                                     "shaders/GLES/shadowMap/DrawShadowMap.frag");
-    m_drawShadowMap->bind();
-    m_drawShadowMap->activateShadowMapTexture();
+    //m_drawShadowMap = Beryll::Renderer::createShader("shaders/GLES/shadowMap/DrawShadowMap.vert",
+    //                                                 "shaders/GLES/shadowMap/DrawShadowMap.frag");
+    //m_drawShadowMap->bind();
+    //m_drawShadowMap->activateShadowMapTexture();
 
     m_simpleSunLight = Beryll::Renderer::createShader("shaders/GLES/SimpleSunLight.vert",
                                                       "shaders/GLES/SimpleSunLight.frag");
@@ -536,6 +550,7 @@ void Play3DSceneLayer::createShaders()
     m_animSunLightShadowMapNormalMap->activateNormalMapTexture();
 }
 
+/*
 void Play3DSceneLayer::drawShadowMap()
 {
     if (quadVAO == 0)
@@ -562,3 +577,4 @@ void Play3DSceneLayer::drawShadowMap()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
+*/

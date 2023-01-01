@@ -25,20 +25,23 @@ int main(int argc, char* argv[])
     // Increase it if your ball penetrates wall but you want collision
     Beryll::Physics::setResolution(4);
 
+    Beryll::LoadingScreen::setTextures({"loadingScreenImages/lowPolyTerrain1.jpg",
+                                                   "loadingScreenImages/lowPolyTerrain2.jpg"});
+
     // Create own class MyLayer and inherit from Beryll::Layer provided by engine
     std::shared_ptr<PlayGUILayer> playGUILayer = std::make_shared<PlayGUILayer>();
     // scene layer will have access to elements from GUI layer
     std::shared_ptr<Play3DSceneLayer> playSceneLayer = std::make_shared<Play3DSceneLayer>(playGUILayer);
 
     // create object of GameState provided by engine + set ID
-    std::shared_ptr<Beryll::GameState> mainState = std::make_shared<Beryll::GameState>();
-    mainState->ID = Beryll::GameStateID::MAIN_MENU;
+    std::shared_ptr<Beryll::GameState> playState = std::make_shared<Beryll::GameState>();
+    playState->ID = Beryll::GameStateID::PLAY;
     // Push MyLayer to GameState->layerStack
-    mainState->layerStack.pushLayer(playSceneLayer);
-    mainState->layerStack.pushOverlay(playGUILayer); // pushOverlay for GUI
+    playState->layerStack.pushLayer(playSceneLayer);
+    playState->layerStack.pushOverlay(playGUILayer); // pushOverlay for GUI
 
     // Push gameState to GameStateMachine
-    Beryll::GameStateMachine::pushState(mainState);
+    Beryll::GameStateMachine::pushState(playState);
 
     Beryll::GameLoop::run();
 

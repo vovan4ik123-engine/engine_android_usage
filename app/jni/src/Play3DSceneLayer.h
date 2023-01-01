@@ -47,8 +47,8 @@ private:
     glm::vec3 m_cameraOffset = glm::vec3(1.0f, 0.0f, 0.0f);
 
     // draw shadow map debug
-    std::shared_ptr<Beryll::Shader> m_drawShadowMap;
-    void drawShadowMap();
-    uint32_t quadVAO = 0;
-    uint32_t quadVBO = 0;
+    //std::shared_ptr<Beryll::Shader> m_drawShadowMap;
+    //void drawShadowMap();
+    //uint32_t quadVAO = 0;
+    //uint32_t quadVBO = 0;
 };
