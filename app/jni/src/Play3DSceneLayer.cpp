@@ -1,6 +1,6 @@
 #include "Play3DSceneLayer.h"
 
-//#include <GLES3/gl31.h>
+//#include <GLES3/gl32.h>
 //#include <GLES3/gl3ext.h>
 
 Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
@@ -55,7 +55,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
 
     Beryll::LoadingScreen::showProgress(0);
 
-    for(int i = 0; i < 1000; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         auto animatedObject = std::make_shared<Beryll::AnimatedObject>("models/garbage/model.dae");
 
@@ -68,7 +68,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
         Beryll::LoadingScreen::showProgress(Beryll::LoadingScreen::getProgress() + 0.02f);
     }
 
-    for(int i = 0; i < 1000; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         auto testBall = std::make_shared<Beryll::CollidingSimpleObject>("models/garbage/SphereSphere.fbx",
                                                                         5.0f,
@@ -88,7 +88,7 @@ Play3DSceneLayer::Play3DSceneLayer(std::shared_ptr<PlayGUILayer> guiLayer)
     }
 
     std::string modelName;
-    for(int i = 1; i <= 100; ++i)
+    for(int i = 1; i <= 1; ++i)
     {
         if(i < 10)
         {

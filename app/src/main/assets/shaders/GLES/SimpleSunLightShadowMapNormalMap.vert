@@ -12,7 +12,6 @@ out vec3 fragPosTangentSpace;
 out vec3 sunLightDirTangentSpace;
 out vec3 cameraPosTangentSpace;
 out vec4 fragPosLightPerspective;
-out float calculateShadows;
 
 uniform mat4 MVPMatrix;
 uniform mat4 MVPLightMatrix;
@@ -27,17 +26,9 @@ void main()
     textureCoords = inTextureCoords;
 
     vec3 fragPos = (modelMatrix * vec4(inPosition, 1.0f)).xyz;
-    fragPosLightPerspective = (MVPLightMatrix * vec4(inPosition, 1.0f));
-    calculateShadows = 0.0f; // = false by default
-    if(fragPosLightPerspective.x >= -1.0f && fragPosLightPerspective.x <= 1.0f &&
-       fragPosLightPerspective.y >= -1.0f && fragPosLightPerspective.y <= 1.0f &&
-       fragPosLightPerspective.z >= -1.0f && fragPosLightPerspective.z <= 1.0f)
-    {
-        // Perspective divide to transform vertex vrom clip space to NDC(-1.0f 1.0f) then to (0.0f 1.0f)
-        fragPosLightPerspective.xyz = (fragPosLightPerspective.xyz / fragPosLightPerspective.w) * 0.5 + 0.5;
-
-        calculateShadows = 1.0f; // = true. fragment visible from light point of view. calculate shadows
-    }
+    fragPosLightPerspective = (MVPLightMatrix * vec4(inPosition, 1.0f)); // transform to view space then to clip space
+    // Perspective divide to transform vertex vrom clip space to NDC(-1.0f 1.0f), then to (0.0f 1.0f)
+    fragPosLightPerspective.xyz = (fragPosLightPerspective.xyz / fragPosLightPerspective.w) * 0.5f + 0.5f;
 
     // lighting
     vec3 T = normalize(normalMatrix * inTangent);
@@ -51,5 +42,6 @@ void main()
     sunLightDirTangentSpace = normalize(TBN * sunLightDir);
     cameraPosTangentSpace = TBN * cameraPos;
 
-    gl_Position = MVPMatrix * vec4(inPosition, 1.0f);
+    gl_Position = MVPMatrix * vec4(inPosition, 1.0f); // transform to view space then to clip space
+    // Perspective divide for gl_Position performed automatically here
 }
