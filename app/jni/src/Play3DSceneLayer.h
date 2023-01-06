@@ -16,6 +16,9 @@ public:
 
 private:
     void createShaders();
+    void loadTestWorld();
+    void loadLeraWorld();
+
     std::shared_ptr<Beryll::Shader> m_simpleSunLight;
     std::shared_ptr<Beryll::Shader> m_animSunLight;
 

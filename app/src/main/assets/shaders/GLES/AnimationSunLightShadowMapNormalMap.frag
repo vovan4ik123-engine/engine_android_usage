@@ -36,8 +36,12 @@ void main()
     float closestDepth = texture(shadowMapTexture, fragPosLightPerspective.xy).r;
     // get depth of current fragment from light's perspective
     float currentDepth = fragPosLightPerspective.z;
-    float shadowMultiplier = closestDepth < currentDepth ? 0.0f : 1.0f;
+    float shadowMultiplier = 1.0f; // 1 means no shadow
+    if(fragPosLightPerspective.z <= 1.0f)
+    {
+        shadowMultiplier = closestDepth < currentDepth - 0.0001f ? 0.0f : 1.0f; // currentDepth - 0.0001f is bias offset
+    }
 
-    vec3 textureCollor = texture(diffuseTexture, textureCoords).rgb * 0.8f;
+    vec3 textureCollor = texture(diffuseTexture, textureCoords).rgb;
     outColor = vec4((ambientLight + (diffuse + specular) * shadowMultiplier) * textureCollor, 1.0f);
 }

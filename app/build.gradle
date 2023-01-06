@@ -23,7 +23,7 @@ android {
                 //arguments "-DCMAKE_BUILD_TYPE=Release"
                 // arguments "-DANDROID_STL=c++_static"
                 // cppFlags "-fexceptions", "-frtti", "-std=c++1z"
-                abiFilters 'arm64-v8a', 'armeabi-v7a'  // 'arm64-v8a' 'armeabi-v7a', 'x86', 'x86_64'
+                abiFilters 'arm64-v8a', 'armeabi-v7a'  // 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
             }
         }
     }
